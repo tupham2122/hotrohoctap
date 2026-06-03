@@ -160,7 +160,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-top">
     <div class="flag-pair">🇻🇳🇯🇵</div>
@@ -173,7 +172,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
   </div>
 </div>
 
-<!-- MODAL XÁC NHẬN -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
     <div class="modal-title" id="modalTitle">Xác nhận</div>
@@ -185,7 +183,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
   </div>
 </div>
 
-<!-- FLASHCARD PANEL -->
 <div class="panel" id="panelFlash">
   <div class="flash-controls">
     <span class="ctrl-label" id="lblGroup">Nhóm:</span>
@@ -215,7 +212,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
   <div id="flashContent"></div>
 </div>
 
-<!-- QUIZ PANEL -->
 <div class="panel" id="panelQuiz">
   <div class="quiz-controls">
     <span class="ctrl-label" id="lblGroup2">Nhóm:</span>
@@ -232,7 +228,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
       <option value="📋 Quy trình">📋 Quy trình</option>
     </select>
     <div class="qtype-wrap">
-      <div class="qtype-btn active" id="qTypeBtn1" onclick="setQuizType('mc')" id="lblMC">🔤 Trắc nghiệm</div>
+      <div class="qtype-btn active" id="qTypeBtn1" onclick="setQuizType('mc')">🔤 Trắc nghiệm</div>
       <div class="qtype-btn" id="qTypeBtn2" onclick="setQuizType('match')">🔗 Nối từ</div>
     </div>
   </div>
@@ -245,7 +241,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
   <div id="quizContent"></div>
 </div>
 
-<!-- STATS PANEL -->
 <div class="panel" id="panelStats">
   <div class="stats-hdr" id="statsTitle">📊 Thống kê học tập</div>
   <div class="stats-grid">
@@ -278,7 +273,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
   <button class="stats-reset-btn" id="resetBtn" onclick="showResetModal()">🗑️ Xoá dữ liệu thống kê</button>
 </div>
 
-<!-- ABOUT PANEL -->
 <div class="panel" id="panelAbout">
   <div class="about-card">
     <h3 id="aboutTitle">📱 App hỗ trợ học từ vựng</h3>
@@ -301,7 +295,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="nav-btn active" id="nav-flash" onclick="setMode('flash')"><span class="nav-icon">🃏</span><span id="navFlash">Flashcard</span></div>
   <div class="nav-btn" id="nav-quiz" onclick="setMode('quiz')"><span class="nav-icon">📝</span><span id="navQuiz">Kiểm tra</span></div>
@@ -310,9 +303,23 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 </div>
 
 <script>
-'''
+// ===== KHAI BÁO DỮ LIỆU MẪU (BỔ SUNG) =====
+const WORDS = [
+  { id: 1, viet: "Máy dập", kanji: "プレス機械", hira: "ぷれすきかい", note: "Máy dùng để tạo lực dập sản phẩm", group: "🔧 Máy móc" },
+  { id: 2, viet: "Khuôn trên", kanji: "上型", hira: "うわがた", note: "Phần khuôn gắn vào bàn trượt (Ram)", group: "🔩 Khuôn" },
+  { id: 3, viet: "Khuôn dưới", kanji: "下型", hira: "したがた", note: "Phần khuôn gắn cố định vào thớt máy (Bolster)", group: "🔩 Khuôn" },
+  { id: 4, viet: "Hành trình dập", kanji: "ストローク", hira: "すとろーく", note: "Khoảng cách di chuyển lên xuống của Ram", group: "⚙️ Gia công" },
+  { id: 5, viet: "Thước cặp", kanji: "ノギス", hira: "のぎす", note: "Dụng cụ đo kích thước chính xác", group: "📏 Đo lường" }
+];
 
-html_js = r'''
+const IMGS = {
+  1: "", 
+  2: "",
+  3: "",
+  4: "",
+  5: ""
+};
+
 // ===== NGÔN NGỮ =====
 let currentLang = localStorage.getItem('lang') || 'vn';
 
@@ -795,4 +802,6 @@ function showQuizDone(el){
 // KHỞI ĐỘNG
 setLang(currentLang);
 setMode('flash');
-</script></body></html>
+</script>
+</body>
+</html>
