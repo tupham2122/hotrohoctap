@@ -1,807 +1,125 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Học Từ Vựng Dập Kim Loại</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
-:root{
-  --red:#C0392B;--navy:#1A2557;--navy-mid:#253275;
-  --gold:#D4AC0D;--gold-light:#FEF9E7;--bg:#F5F6FA;--card:#FFFFFF;
-  --text:#1C1C2E;--muted:#6B7280;--border:#E5E7EB;
-  --shadow:0 2px 12px rgba(0,0,0,0.08);--radius:14px;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
-
-/* HEADER */
-.header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#C0392B 100%);padding:14px 16px;position:sticky;top:0;z-index:100;box-shadow:0 3px 16px rgba(0,0,0,0.25)}
-.header-top{display:flex;align-items:center;gap:10px}
-.flag-pair{font-size:20px;line-height:1;flex-shrink:0}
-.header h1{color:#fff;font-size:14px;font-weight:700;line-height:1.2}
-.header h1 span{display:block;font-size:10px;font-weight:400;opacity:.75;font-family:'Noto Sans JP',sans-serif;margin-top:2px}
-.count-badge{background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:600;padding:4px 8px;border-radius:20px;white-space:nowrap}
-.lang-toggle{display:flex;gap:4px;margin-left:auto;flex-shrink:0}
-.lang-btn{padding:4px 9px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.4);background:transparent;color:rgba(255,255,255,.7)}
-.lang-btn.active{background:rgba(255,255,255,.25);color:#fff;border-color:rgba(255,255,255,.8)}
-
-/* NAV */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:200}
-.nav-btn{flex:1;padding:10px 4px 12px;text-align:center;cursor:pointer;font-size:10px;font-weight:600;color:var(--muted);user-select:none}
-.nav-btn .nav-icon{font-size:20px;display:block;margin-bottom:2px}
-.nav-btn.active{color:var(--red)}
-
-/* PANELS */
-.panel{display:none;padding:16px;padding-bottom:100px}
-.panel.visible{display:block}
-.speak-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;opacity:.7;vertical-align:middle}
-.speak-btn:active{opacity:1;transform:scale(1.2)}
-
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.visible{display:flex}
-.modal-box{background:#fff;border-radius:16px;padding:24px;margin:20px;max-width:320px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.2)}
-.modal-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px}
-.modal-msg{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
-.modal-btns{display:flex;gap:10px}
-.modal-btn-cancel{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted)}
-.modal-btn-confirm{flex:1;padding:11px;border-radius:10px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
-
-/* FLASHCARD */
-.flash-controls{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.ctrl-label{font-size:12px;font-weight:600;color:var(--muted)}
-.group-sel{flex:1;font-size:13px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:none}
-.mode-wrap{display:flex;gap:6px}
-.mode-btn{padding:6px 10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--muted)}
-.mode-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-.stat-row{display:flex;gap:8px;margin-bottom:12px}
-.stat-box{flex:1;background:#fff;border-radius:10px;padding:8px;text-align:center;box-shadow:var(--shadow)}
-.stat-num{font-size:20px;font-weight:700;line-height:1}
-.stat-lbl{font-size:10px;color:var(--muted);margin-top:2px}
-.stat-num.green{color:#27AE60}.stat-num.red{color:var(--red)}.stat-num.blue{color:var(--navy)}
-.progress-wrap{background:var(--border);border-radius:4px;height:5px;margin-bottom:14px;overflow:hidden}
-.progress-bar{height:100%;background:linear-gradient(90deg,var(--navy),var(--red));border-radius:4px;transition:width .4s}
-.card-wrap{perspective:1000px;min-height:280px;margin-bottom:70px;cursor:pointer}
-.fc{width:100%;min-height:280px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
-.fc.flipped{transform:rotateY(180deg)}
-.fc-face{position:absolute;width:100%;min-height:280px;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,.12)}
-.fc-front{background:linear-gradient(135deg,var(--navy) 0%,#253272 100%);color:#fff}
-.fc-back{background:#fff;transform:rotateY(180deg);border:2px solid var(--border)}
-.fc-hint{font-size:11px;opacity:.6;margin-bottom:12px;text-align:center}
-.fc-main{font-size:26px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:8px}
-.fc-sub{font-size:14px;opacity:.75;text-align:center}
-.fc-img-wrap{margin:10px auto 0;background:#f5f6fa;border-radius:10px;padding:8px;display:flex;align-items:center;justify-content:center;min-height:80px;width:160px}
-.fc-img{max-width:150px;max-height:90px;object-fit:contain}
-.fc-back-viet{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px;text-align:center}
-.fc-back-jp{font-family:'Noto Sans JP',sans-serif;font-size:22px;color:var(--red);font-weight:700;text-align:center;margin-bottom:4px}
-.fc-back-hira{font-family:'Noto Sans JP',sans-serif;font-size:14px;color:var(--muted);text-align:center;margin-bottom:8px}
-.fc-back-note{font-size:12px;color:var(--muted);font-style:italic;text-align:center;max-width:260px}
-.fc-back-group{display:inline-block;background:var(--gold-light);color:#7D6608;border:1px solid #F9E79F;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:8px}
-.tap-hint{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px}
-.flash-actions{display:flex;gap:12px;position:fixed;bottom:65px;left:0;right:0;padding:0 16px;z-index:100}
-.flash-btn{flex:1;padding:14px 8px;border-radius:16px;border:none;font-weight:700;cursor:pointer;transition:transform .1s;box-shadow:0 2px 10px rgba(0,0,0,0.15);display:flex;flex-direction:column;align-items:center;gap:4px}
-.flash-btn:active{transform:scale(.95)}
-.flash-btn .bi{font-size:26px;line-height:1}
-.flash-btn .bl{font-size:13px;font-weight:700}
-.flash-btn.wrong{background:#FADBD8;color:var(--red)}
-.flash-btn.good{background:#D5F5E3;color:#1E8449}
-.done-wrap{text-align:center;padding:40px 16px}
-.done-icon{font-size:56px;margin-bottom:12px}
-.done-wrap h2{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:8px}
-.done-wrap p{font-size:14px;color:var(--muted);margin-bottom:16px}
-.restart-btn{background:var(--navy);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer}
-.empty-wrap{text-align:center;padding:60px 20px;color:var(--muted)}
-
-/* QUIZ */
-.quiz-controls{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.qtype-wrap{display:flex;gap:6px;width:100%}
-.qtype-btn{flex:1;padding:7px 4px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--muted);text-align:center}
-.qtype-btn.active{background:var(--red);color:#fff;border-color:var(--red)}
-.mc-card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px}
-.mc-qnum{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:8px}
-.mc-img-wrap{display:flex;justify-content:center;margin-bottom:14px;background:#f5f6fa;border-radius:10px;padding:8px}
-.mc-img{max-width:140px;max-height:85px;object-fit:contain}
-.mc-q{font-size:18px;font-weight:700;color:var(--navy);text-align:center;margin-bottom:6px;line-height:1.3}
-.mc-q.jp{font-family:'Noto Sans JP',sans-serif;color:var(--red)}
-.mc-sub{font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px}
-.mc-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mc-opt{padding:12px 10px;border-radius:12px;border:2px solid var(--border);background:#fff;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;line-height:1.3;color:var(--text)}
-.mc-opt:active{transform:scale(.97)}
-.mc-opt.correct{background:#D5F5E3;border-color:#27AE60;color:#1E8449}
-.mc-opt.wrong{background:#FADBD8;border-color:var(--red);color:var(--red)}
-.mc-opt.disabled{pointer-events:none;opacity:.6}
-.mc-fb{text-align:center;padding:10px;font-size:13px;font-weight:600;border-radius:10px;margin-top:10px}
-.mc-fb.ok{background:#D5F5E3;color:#1E8449}
-.mc-fb.fail{background:#FADBD8;color:var(--red)}
-.mc-next{width:100%;padding:13px;border-radius:12px;border:none;background:var(--navy);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px}
-.match-wrap{background:#fff;border-radius:16px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:14px}
-.match-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;text-align:center}
-.match-cols{display:flex;gap:10px}
-.match-col{flex:1;display:flex;flex-direction:column;gap:8px}
-.match-lbl{font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-.match-item{padding:10px 8px;border-radius:10px;border:2px solid var(--border);font-size:13px;font-weight:600;text-align:center;cursor:pointer;transition:all .15s;line-height:1.3;min-height:44px;display:flex;align-items:center;justify-content:center}
-.match-item.jp{font-family:'Noto Sans JP',sans-serif;color:var(--red)}
-.match-item.selected{border-color:var(--navy);background:#EBF3FB}
-.match-item.matched-ok{border-color:#27AE60;background:#D5F5E3;color:#1E8449;pointer-events:none}
-.match-item.matched-fail{border-color:var(--red);background:#FADBD8;color:var(--red)}
-.match-next{width:100%;padding:13px;border-radius:12px;border:none;background:var(--navy);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px}
-
-/* STATS */
-.stats-hdr{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:14px}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.stats-box{background:#fff;border-radius:14px;padding:14px;box-shadow:var(--shadow);text-align:center}
-.stats-num{font-size:30px;font-weight:700;line-height:1;color:var(--navy)}
-.stats-num.green{color:#27AE60}.stats-num.red{color:var(--red)}.stats-num.gold{color:var(--gold)}
-.stats-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600}
-.stats-section{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
-.stats-section h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px}
-.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.bar-lbl{font-size:12px;color:var(--muted);min-width:60px;font-weight:600}
-.bar-wrap{flex:1;background:var(--border);border-radius:4px;height:8px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
-.bar-fill.green{background:#27AE60}.bar-fill.red{background:var(--red)}
-.bar-val{font-size:12px;font-weight:700;min-width:36px;text-align:right}
-.day-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
-.day-row:last-child{border-bottom:none}
-.day-date{font-size:12px;color:var(--muted);font-weight:600}
-.day-info{display:flex;gap:12px}
-.day-info span{font-size:12px;font-weight:700}
-.day-info .g{color:#27AE60}.day-info .r{color:var(--red)}
-.stats-reset-btn{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;margin-top:4px}
-.smart-badge{display:inline-block;background:var(--gold-light);color:#7D6608;border:1px solid #F9E79F;font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;margin-left:6px}
-
-/* ABOUT */
-.about-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:12px}
-.about-card h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px}
-.about-card p,.about-card li{font-size:13px;color:var(--muted);line-height:1.7}
-.about-card ul{padding-left:18px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Đơn Giản</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #475569;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-top">
-    <div class="flag-pair">🇻🇳🇯🇵</div>
-    <h1 id="appTitle">Học Từ Vựng Dập Kim Loại<span>金属プレス加工 専門用語</span></h1>
-    <div class="count-badge">181</div>
-    <div class="lang-toggle">
-      <button class="lang-btn active" id="langVN" onclick="setLang('vn')">VN</button>
-      <button class="lang-btn" id="langJP" onclick="setLang('jp')">JP</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="confirmModal">
-  <div class="modal-box">
-    <div class="modal-title" id="modalTitle">Xác nhận</div>
-    <div class="modal-msg" id="modalMsg">Bạn có chắc chắn không?</div>
-    <div class="modal-btns">
-      <button class="modal-btn-cancel" id="modalCancel" onclick="closeModal()">Huỷ</button>
-      <button class="modal-btn-confirm" id="modalConfirm">Xoá</button>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="panelFlash">
-  <div class="flash-controls">
-    <span class="ctrl-label" id="lblGroup">Nhóm:</span>
-    <select class="group-sel" id="flashGroupSel" onchange="initFlash()">
-      <option value="all" data-vn="Tất cả (181 từ)" data-jp="すべて (181語)">Tất cả (181 từ)</option>
-      <option value="fav" data-vn="⭐ Đã lưu" data-jp="⭐ お気に入り">⭐ Đã lưu</option>
-      <option value="smart" data-vn="🧠 Ôn tập thông minh" data-jp="🧠 スマート復習">🧠 Ôn tập thông minh</option>
-      <option value="🔧 Máy móc">🔧 Máy móc</option>
-      <option value="🔩 Khuôn">🔩 Khuôn</option>
-      <option value="⚙️ Gia công">⚙️ Gia công</option>
-      <option value="📏 Đo lường">📏 Đo lường</option>
-      <option value="🛡️ An toàn">🛡️ An toàn</option>
-      <option value="🔨 Vật liệu">🔨 Vật liệu</option>
-      <option value="📋 Quy trình">📋 Quy trình</option>
-    </select>
-    <div class="mode-wrap">
-      <button class="mode-btn active" id="btnModeVN" onclick="setFlashMode('vn')">VN→JP</button>
-      <button class="mode-btn" id="btnModeJP" onclick="setFlashMode('jp')">JP→VN</button>
-    </div>
-  </div>
-  <div class="stat-row">
-    <div class="stat-box"><div class="stat-num blue" id="fsTotal">0</div><div class="stat-lbl" id="lblRemain">Còn lại</div></div>
-    <div class="stat-box"><div class="stat-num green" id="fsGood">0</div><div class="stat-lbl" id="lblKnow">Thuộc</div></div>
-    <div class="stat-box"><div class="stat-num red" id="fsBad">0</div><div class="stat-lbl" id="lblDontKnow">Chưa thuộc</div></div>
-  </div>
-  <div class="progress-wrap"><div class="progress-bar" id="flashBar" style="width:0%"></div></div>
-  <div id="flashContent"></div>
-</div>
-
-<div class="panel" id="panelQuiz">
-  <div class="quiz-controls">
-    <span class="ctrl-label" id="lblGroup2">Nhóm:</span>
-    <select class="group-sel" id="quizGroupSel" onchange="initQuiz()">
-      <option value="all">Tất cả (181 từ)</option>
-      <option value="fav">⭐ Đã lưu</option>
-      <option value="smart">🧠 Ôn tập thông minh</option>
-      <option value="🔧 Máy móc">🔧 Máy móc</option>
-      <option value="🔩 Khuôn">🔩 Khuôn</option>
-      <option value="⚙️ Gia công">⚙️ Gia công</option>
-      <option value="📏 Đo lường">📏 Đo lường</option>
-      <option value="🛡️ An toàn">🛡️ An toàn</option>
-      <option value="🔨 Vật liệu">🔨 Vật liệu</option>
-      <option value="📋 Quy trình">📋 Quy trình</option>
-    </select>
-    <div class="qtype-wrap">
-      <div class="qtype-btn active" id="qTypeBtn1" onclick="setQuizType('mc')">🔤 Trắc nghiệm</div>
-      <div class="qtype-btn" id="qTypeBtn2" onclick="setQuizType('match')">🔗 Nối từ</div>
-    </div>
-  </div>
-  <div class="stat-row">
-    <div class="stat-box"><div class="stat-num blue" id="qsTotal">0</div><div class="stat-lbl" id="lblQuestions">Câu hỏi</div></div>
-    <div class="stat-box"><div class="stat-num green" id="qsCorrect">0</div><div class="stat-lbl" id="lblCorrect">Đúng</div></div>
-    <div class="stat-box"><div class="stat-num red" id="qsWrong">0</div><div class="stat-lbl" id="lblIncorrect">Sai</div></div>
-  </div>
-  <div class="progress-wrap"><div class="progress-bar" id="quizBar" style="width:0%"></div></div>
-  <div id="quizContent"></div>
-</div>
-
-<div class="panel" id="panelStats">
-  <div class="stats-hdr" id="statsTitle">📊 Thống kê học tập</div>
-  <div class="stats-grid">
-    <div class="stats-box"><div class="stats-num gold" id="stStreak">0</div><div class="stats-lbl" id="lblStreak">🔥 Ngày liên tiếp</div></div>
-    <div class="stats-box"><div class="stats-num" id="stTotal">0</div><div class="stats-lbl" id="lblTotalSessions">📚 Tổng lượt học</div></div>
-    <div class="stats-box"><div class="stats-num green" id="stCorrect">0</div><div class="stats-lbl" id="lblTotalCorrect">✅ Trả lời đúng</div></div>
-    <div class="stats-box"><div class="stats-num red" id="stWrong">0</div><div class="stats-lbl" id="lblTotalWrong">❌ Trả lời sai</div></div>
-  </div>
-  <div class="stats-section">
-    <h3 id="lblAccuracy">🎯 Tỉ lệ đúng tổng</h3>
-    <div class="bar-row">
-      <span class="bar-lbl" id="lblRight">Đúng</span>
-      <div class="bar-wrap"><div class="bar-fill green" id="stBarGood" style="width:0%"></div></div>
-      <span class="bar-val" id="stPct">0%</span>
-    </div>
-    <div class="bar-row">
-      <span class="bar-lbl" id="lblWrong2">Sai</span>
-      <div class="bar-wrap"><div class="bar-fill red" id="stBarBad" style="width:0%"></div></div>
-      <span class="bar-val" id="stPctW">0%</span>
-    </div>
-  </div>
-  <div class="stats-section">
-    <h3 id="lblHistory">📅 Lịch sử 7 ngày gần nhất</h3>
-    <div id="stHistory"></div>
-  </div>
-  <div class="stats-section">
-    <h3 id="lblWeakTitle">⚠️ Từ cần ôn lại <span class="smart-badge" id="lblWeakBadge">hay sai nhất</span></h3>
-    <div id="stWeakWords"></div>
-  </div>
-  <button class="stats-reset-btn" id="resetBtn" onclick="showResetModal()">🗑️ Xoá dữ liệu thống kê</button>
-</div>
-
-<div class="panel" id="panelAbout">
-  <div class="about-card">
-    <h3 id="aboutTitle">📱 App hỗ trợ học từ vựng</h3>
-    <p id="aboutDesc">Ứng dụng học từ vựng chuyên ngành gia công dập kim loại (金属プレス加工), tiếng Việt — tiếng Nhật. Gồm 181 thuật ngữ có ảnh minh hoạ kỹ thuật.</p>
-  </div>
-  <div class="about-card">
-    <h3 id="aboutHow">💡 Cách dùng</h3>
-    <ul id="aboutList">
-      <li><b>🃏 Flashcard:</b> Lật thẻ, đánh giá mức độ thuộc bài</li>
-      <li><b>📝 Kiểm tra:</b> Trắc nghiệm 4 đáp án hoặc nối từ</li>
-      <li><b>📊 Thống kê:</b> Theo dõi tiến độ học tập theo ngày</li>
-      <li><b>🔊 Phát âm:</b> Bấm nút loa để nghe tiếng Nhật</li>
-      <li><b>🧠 Ôn tập thông minh:</b> App tự ưu tiên từ hay sai</li>
-    </ul>
-  </div>
-  <div class="about-card">
-    <h3 id="aboutSave">📱 Lưu vào màn hình điện thoại</h3>
-    <p id="aboutIOS"><b>iPhone:</b> Bấm nút chia sẻ → "Thêm vào Màn hình chính"</p>
-    <p id="aboutAND" style="margin-top:6px"><b>Android:</b> Bấm menu ⋮ → "Thêm vào màn hình chính"</p>
-  </div>
-</div>
-
-<div class="bottom-nav">
-  <div class="nav-btn active" id="nav-flash" onclick="setMode('flash')"><span class="nav-icon">🃏</span><span id="navFlash">Flashcard</span></div>
-  <div class="nav-btn" id="nav-quiz" onclick="setMode('quiz')"><span class="nav-icon">📝</span><span id="navQuiz">Kiểm tra</span></div>
-  <div class="nav-btn" id="nav-stats" onclick="setMode('stats')"><span class="nav-icon">📊</span><span id="navStats">Thống kê</span></div>
-  <div class="nav-btn" id="nav-about" onclick="setMode('about')"><span class="nav-icon">ℹ️</span><span id="navAbout">Về App</span></div>
-</div>
-
-<script>
-// ===== KHAI BÁO DỮ LIỆU MẪU (BỔ SUNG) =====
-const WORDS = [
-  { id: 1, viet: "Máy dập", kanji: "プレス機械", hira: "ぷれすきかい", note: "Máy dùng để tạo lực dập sản phẩm", group: "🔧 Máy móc" },
-  { id: 2, viet: "Khuôn trên", kanji: "上型", hira: "うわがた", note: "Phần khuôn gắn vào bàn trượt (Ram)", group: "🔩 Khuôn" },
-  { id: 3, viet: "Khuôn dưới", kanji: "下型", hira: "したがた", note: "Phần khuôn gắn cố định vào thớt máy (Bolster)", group: "🔩 Khuôn" },
-  { id: 4, viet: "Hành trình dập", kanji: "ストローク", hira: "すとろーく", note: "Khoảng cách di chuyển lên xuống của Ram", group: "⚙️ Gia công" },
-  { id: 5, viet: "Thước cặp", kanji: "ノギス", hira: "のぎす", note: "Dụng cụ đo kích thước chính xác", group: "📏 Đo lường" }
-];
-
-const IMGS = {
-  1: "", 
-  2: "",
-  3: "",
-  4: "",
-  5: ""
-};
-
-// ===== NGÔN NGỮ =====
-let currentLang = localStorage.getItem('lang') || 'vn';
-
-const LANG = {
-  vn: {
-    navFlash:'Flashcard', navQuiz:'Kiểm tra', navStats:'Thống kê', navAbout:'Về App',
-    lblGroup:'Nhóm:', lblRemain:'Còn lại', lblKnow:'Thuộc', lblDontKnow:'Chưa thuộc',
-    lblQuestions:'Câu hỏi', lblCorrect:'Đúng', lblIncorrect:'Sai',
-    statsTitle:'📊 Thống kê học tập',
-    lblStreak:'🔥 Ngày liên tiếp', lblTotalSessions:'📚 Tổng lượt học',
-    lblTotalCorrect:'✅ Trả lời đúng', lblTotalWrong:'❌ Trả lời sai',
-    lblAccuracy:'🎯 Tỉ lệ đúng tổng', lblRight:'Đúng', lblWrong2:'Sai',
-    lblHistory:'📅 Lịch sử 7 ngày gần nhất',
-    lblWeakTitle:'⚠️ Từ cần ôn lại', lblWeakBadge:'hay sai nhất',
-    resetBtn:'🗑️ Xoá dữ liệu thống kê',
-    modalTitle:'Xác nhận xoá', modalMsg:'Toàn bộ dữ liệu thống kê sẽ bị xoá. Bạn có chắc không?',
-    modalCancel:'Huỷ', modalConfirm:'Xoá',
-    today:'Hôm nay', noData:'Chưa có dữ liệu', weakTimes:'lần sai',
-    aboutTitle:'📱 App hỗ trợ học từ vựng',
-    aboutDesc:'Ứng dụng học từ vựng chuyên ngành gia công dập kim loại (金属プレス加工), tiếng Việt — tiếng Nhật. Gồm 181 thuật ngữ có ảnh minh hoạ kỹ thuật.',
-    aboutHow:'💡 Cách dùng', aboutSave:'📱 Lưu vào màn hình điện thoại',
-    aboutIOS:'<b>iPhone:</b> Bấm nút chia sẻ → "Thêm vào Màn hình chính"',
-    aboutAND:'<b>Android:</b> Bấm menu ⋮ → "Thêm vào màn hình chính"',
-    tapHint:'👆 Bấm vào thẻ để lật',
-    frontHint:'Bạn có nhớ từ này không?', backHint:'Đáp án',
-    flipHint:'Lật thẻ trước khi đánh giá',
-    btnWrong:'Chưa thuộc', btnGood:'Thuộc rồi',
-    doneXs:'Xuất sắc!', doneGood:'Tốt lắm!', doneNeed:'Cần ôn thêm!',
-    doneTxt:'Thuộc', doneTxt2:'từ', doneChua:'Chưa thuộc',
-    restartBtn:'🔄 Học lại',
-    mcCorrect:'✅ Chính xác!', mcWrong:'❌ Sai rồi — đáp án đúng đã được đánh dấu xanh',
-    mcNext:'Câu tiếp theo →',
-    matchTitle:'Nối từ tiếng Việt với chữ Nhật tương ứng',
-    matchLbl1:'🇻🇳 Tiếng Việt', matchLbl2:'🇯🇵 Tiếng Nhật',
-    matchDone:'🎉 Hoàn thành!', matchNext:'Tiếp theo →',
-    quizDoneXs:'Xuất sắc!', quizDoneGood:'Khá tốt!', quizDoneNeed:'Cần ôn thêm!',
-    quizDoneRight:'Đúng', quizDoneWrong:'Sai', quizDonePct:'Tỉ lệ đúng:',
-    quizRestart:'🔄 Làm lại',
-    qTypeMC:'🔤 Trắc nghiệm', qTypeMatch:'🔗 Nối từ',
-    emptyMsg:'Chưa có từ nào — hãy chọn nhóm khác',
-  },
-  jp: {
-    navFlash:'フラッシュ', navQuiz:'テスト', navStats:'統計', navAbout:'アプリ情報',
-    lblGroup:'グループ:', lblRemain:'残り', lblKnow:'覚えた', lblDontKnow:'未定着',
-    lblQuestions:'問題数', lblCorrect:'正解', lblIncorrect:'不正解',
-    statsTitle:'📊 学習統計',
-    lblStreak:'🔥 連続日数', lblTotalSessions:'📚 総学習回数',
-    lblTotalCorrect:'✅ 正解数', lblTotalWrong:'❌ 不正解数',
-    lblAccuracy:'🎯 正解率', lblRight:'正解', lblWrong2:'不正解',
-    lblHistory:'📅 直近7日間の履歴',
-    lblWeakTitle:'⚠️ 復習が必要な単語', lblWeakBadge:'最も間違えた',
-    resetBtn:'🗑️ 統計データを削除',
-    modalTitle:'削除の確認', modalMsg:'すべての統計データが削除されます。よろしいですか？',
-    modalCancel:'キャンセル', modalConfirm:'削除',
-    today:'今日', noData:'データなし', weakTimes:'回不正解',
-    aboutTitle:'📱 語彙学習アプリ',
-    aboutDesc:'金属プレス加工の専門用語を学ぶアプリです。ベトナム語と日本語で181語を収録、図解付き。',
-    aboutHow:'💡 使い方', aboutSave:'📱 ホーム画面に追加',
-    aboutIOS:'<b>iPhone:</b> 共有ボタン → 「ホーム画面に追加」',
-    aboutAND:'<b>Android:</b> メニュー ⋮ → 「ホーム画面に追加」',
-    tapHint:'👆 カードをタップして裏返す',
-    frontHint:'この単語を覚えていますか？', backHint:'答え',
-    flipHint:'評価する前にカードを裏返してください',
-    btnWrong:'未定着', btnGood:'覚えた',
-    doneXs:'素晴らしい！', doneGood:'よくできました！', doneNeed:'要復習！',
-    doneTxt:'習得', doneTxt2:'語', doneChua:'未定着',
-    restartBtn:'🔄 もう一度',
-    mcCorrect:'✅ 正解！', mcWrong:'❌ 不正解 — 正解が緑で示されています',
-    mcNext:'次の問題 →',
-    matchTitle:'ベトナム語と日本語を結びつけてください',
-    matchLbl1:'🇻🇳 ベトナム語', matchLbl2:'🇯🇵 日本語',
-    matchDone:'🎉 完了！', matchNext:'次へ →',
-    quizDoneXs:'素晴らしい！', quizDoneGood:'よくできました！', quizDoneNeed:'要復習！',
-    quizDoneRight:'正解', quizDoneWrong:'不正解', quizDonePct:'正解率:',
-    quizRestart:'🔄 もう一度',
-    qTypeMC:'🔤 四択問題', qTypeMatch:'🔗 マッチング',
-    emptyMsg:'単語がありません — 他のグループを選んでください',
-  }
-};
-
-function setLang(lang) {
-  currentLang = lang;
-  localStorage.setItem('lang', lang);
-  document.getElementById('langVN').classList.toggle('active', lang==='vn');
-  document.getElementById('langJP').classList.toggle('active', lang==='jp');
-  const L = LANG[lang];
-  // Nav
-  document.getElementById('navFlash').textContent = L.navFlash;
-  document.getElementById('navQuiz').textContent = L.navQuiz;
-  document.getElementById('navStats').textContent = L.navStats;
-  document.getElementById('navAbout').textContent = L.navAbout;
-  // Flash labels
-  document.getElementById('lblGroup').textContent = L.lblGroup;
-  document.getElementById('lblGroup2').textContent = L.lblGroup;
-  document.getElementById('lblRemain').textContent = L.lblRemain;
-  document.getElementById('lblKnow').textContent = L.lblKnow;
-  document.getElementById('lblDontKnow').textContent = L.lblDontKnow;
-  // Quiz labels
-  document.getElementById('lblQuestions').textContent = L.lblQuestions;
-  document.getElementById('lblCorrect').textContent = L.lblCorrect;
-  document.getElementById('lblIncorrect').textContent = L.lblIncorrect;
-  document.getElementById('qTypeBtn1').textContent = L.qTypeMC;
-  document.getElementById('qTypeBtn2').textContent = L.qTypeMatch;
-  // Stats labels
-  document.getElementById('statsTitle').textContent = L.statsTitle;
-  document.getElementById('lblStreak').textContent = L.lblStreak;
-  document.getElementById('lblTotalSessions').textContent = L.lblTotalSessions;
-  document.getElementById('lblTotalCorrect').textContent = L.lblTotalCorrect;
-  document.getElementById('lblTotalWrong').textContent = L.lblTotalWrong;
-  document.getElementById('lblAccuracy').textContent = L.lblAccuracy;
-  document.getElementById('lblRight').textContent = L.lblRight;
-  document.getElementById('lblWrong2').textContent = L.lblWrong2;
-  document.getElementById('lblHistory').textContent = L.lblHistory;
-  document.getElementById('lblWeakTitle').childNodes[0].textContent = L.lblWeakTitle + ' ';
-  document.getElementById('lblWeakBadge').textContent = L.lblWeakBadge;
-  document.getElementById('resetBtn').textContent = L.resetBtn;
-  // About
-  document.getElementById('aboutTitle').textContent = L.aboutTitle;
-  document.getElementById('aboutDesc').textContent = L.aboutDesc;
-  document.getElementById('aboutHow').textContent = L.aboutHow;
-  document.getElementById('aboutSave').textContent = L.aboutSave;
-  document.getElementById('aboutIOS').innerHTML = L.aboutIOS;
-  document.getElementById('aboutAND').innerHTML = L.aboutAND;
-  // Re-render current panel
-  const activePanel = document.querySelector('.panel.visible');
-  if (activePanel) {
-    const id = activePanel.id;
-    if (id==='panelFlash') renderFlashCard();
-    else if (id==='panelQuiz') renderQuiz();
-    else if (id==='panelStats') renderStats();
-  }
-}
-
-// ===== MODAL =====
-let _modalCallback = null;
-
-function showResetModal() {
-  const L = LANG[currentLang];
-  document.getElementById('modalTitle').textContent = L.modalTitle;
-  document.getElementById('modalMsg').textContent = L.modalMsg;
-  document.getElementById('modalCancel').textContent = L.modalCancel;
-  document.getElementById('modalConfirm').textContent = L.modalConfirm;
-  _modalCallback = () => {
-    localStorage.removeItem('learnStats');
-    closeModal();
-    renderStats();
-  };
-  document.getElementById('confirmModal').classList.add('visible');
-}
-
-document.getElementById('modalConfirm').onclick = () => { if(_modalCallback) _modalCallback(); };
-function closeModal() { document.getElementById('confirmModal').classList.remove('visible'); _modalCallback=null; }
-document.getElementById('confirmModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
-
-// ===== NAVIGATION =====
-function setMode(m) {
-  document.querySelectorAll('.nav-btn').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('visible'));
-  const navEl = document.getElementById('nav-'+m);
-  if(navEl) navEl.classList.add('active');
-  const panelId = 'panel' + m.charAt(0).toUpperCase() + m.slice(1);
-  const panelEl = document.getElementById(panelId);
-  if(panelEl) panelEl.classList.add('visible');
-  if(m==='flash') initFlash();
-  else if(m==='quiz') initQuiz();
-  else if(m==='stats') renderStats();
-}
-
-// ===== PHÁT ÂM =====
-function speak(text) {
-  if(!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang='ja-JP'; u.rate=0.85; u.pitch=1;
-  const voices = window.speechSynthesis.getVoices();
-  const jp = voices.find(v=>v.lang&&v.lang.startsWith('ja'));
-  if(jp) u.voice=jp;
-  window.speechSynthesis.speak(u);
-}
-if(window.speechSynthesis){
-  window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
-}
-
-// ===== THỐNG KÊ =====
-let favorites = JSON.parse(localStorage.getItem('favs')||'[]');
-function getTodayKey(){ return new Date().toISOString().slice(0,10); }
-function loadStats(){ return JSON.parse(localStorage.getItem('learnStats')||'{"total":0,"correct":0,"wrong":0,"days":{},"wordErrors":{}}'); }
-function saveStats(s){ localStorage.setItem('learnStats',JSON.stringify(s)); }
-
-function recordAnswer(isCorrect, wordId) {
-  const s = loadStats();
-  s.total++;
-  if(isCorrect) s.correct++; else s.wrong++;
-  const today = getTodayKey();
-  if(!s.days[today]) s.days[today]={correct:0,wrong:0};
-  if(isCorrect) s.days[today].correct++; else s.days[today].wrong++;
-  if(!isCorrect) s.wordErrors[wordId]=(s.wordErrors[wordId]||0)+1;
-  else if(s.wordErrors[wordId]) s.wordErrors[wordId]=Math.max(0,s.wordErrors[wordId]-0.5);
-  saveStats(s);
-}
-
-function calcStreak(days) {
-  let streak=0;
-  const today=new Date();
-  for(let i=0;i<365;i++){
-    const d=new Date(today); d.setDate(d.getDate()-i);
-    const key=d.toISOString().slice(0,10);
-    if(days[key]&&(days[key].correct+days[key].wrong)>0) streak++;
-    else if(i>0) break;
-  }
-  return streak;
-}
-
-function getSmartDeck() {
-  const s=loadStats();
-  const err=Object.entries(s.wordErrors).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])
-    .map(([id])=>WORDS.find(w=>w.id==id)).filter(Boolean);
-  const seenIds=new Set(Object.keys(s.wordErrors).map(Number));
-  const unseen=WORDS.filter(w=>!seenIds.has(w.id)).sort(()=>Math.random()-.5);
-  return [...err,...unseen];
-}
-
-function renderStats() {
-  const s=loadStats(); const L=LANG[currentLang];
-  const total=s.correct+s.wrong;
-  const pG=total?Math.round(s.correct/total*100):0;
-  const pW=total?Math.round(s.wrong/total*100):0;
-  document.getElementById('stStreak').textContent=calcStreak(s.days);
-  document.getElementById('stTotal').textContent=s.total;
-  document.getElementById('stCorrect').textContent=s.correct;
-  document.getElementById('stWrong').textContent=s.wrong;
-  document.getElementById('stPct').textContent=pG+'%';
-  document.getElementById('stPctW').textContent=pW+'%';
-  document.getElementById('stBarGood').style.width=pG+'%';
-  document.getElementById('stBarBad').style.width=pW+'%';
-  const days=[];
-  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
-  document.getElementById('stHistory').innerHTML=days.map(day=>{
-    const data=s.days[day]||{correct:0,wrong:0};
-    const tot=data.correct+data.wrong;
-    const lbl=day===getTodayKey()?L.today:day.slice(5).replace('-','/');
-    return `<div class="day-row"><span class="day-date">${lbl}</span><div class="day-info">${tot===0?`<span style="color:var(--muted);font-size:12px">${L.noData}</span>`:`<span class="g">✅ ${data.correct}</span><span class="r">❌ ${data.wrong}</span>`}</div></div>`;
-  }).join('');
-  const sorted=Object.entries(s.wordErrors).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('stWeakWords').innerHTML=sorted.length?sorted.map(([id,cnt])=>{
-    const w=WORDS.find(x=>x.id==id); if(!w) return '';
-    return `<div class="day-row"><div><div style="font-size:13px;font-weight:700;color:var(--navy)">${w.viet}</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--red)">${w.kanji}</div></div><span style="font-size:12px;font-weight:700;color:var(--red)">${Math.ceil(cnt)} ${L.weakTimes}</span></div>`;
-  }).join(''):`<p style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0">${L.noData}</p>`;
-}
-
-// ===== FLASHCARD =====
-let flashDeck=[],flashIdx=0,flashGood=0,flashBad=0,flashMode='vn',flashFlipped=false;
-
-function setFlashMode(m){
-  flashMode=m;
-  document.getElementById('btnModeVN').classList.toggle('active',m==='vn');
-  document.getElementById('btnModeJP').classList.toggle('active',m==='jp');
-  initFlash();
-}
-
-function initFlash(){
-  const grp=document.getElementById('flashGroupSel').value;
-  let pool;
-  if(grp==='all') pool=[...WORDS];
-  else if(grp==='fav') pool=WORDS.filter(w=>favorites.includes(w.id));
-  else if(grp==='smart') pool=getSmartDeck();
-  else pool=WORDS.filter(w=>w.group===grp);
-  flashDeck=(pool.length?pool:[...WORDS]).sort(()=>Math.random()-.5);
-  flashIdx=0;flashGood=0;flashBad=0;flashFlipped=false;
-  updateFlashStats();renderFlashCard();
-}
-
-function updateFlashStats(){
-  document.getElementById('fsTotal').textContent=Math.max(0,flashDeck.length-flashIdx);
-  document.getElementById('fsGood').textContent=flashGood;
-  document.getElementById('fsBad').textContent=flashBad;
-  document.getElementById('flashBar').style.width=(flashDeck.length?Math.round(flashIdx/flashDeck.length*100):0)+'%';
-}
-
-function renderFlashCard(){
-  const el=document.getElementById('flashContent');
-  const L=LANG[currentLang];
-  if(!flashDeck.length){el.innerHTML=`<div class="empty-wrap"><div style="font-size:48px">📭</div><p>${L.emptyMsg}</p></div>`;return;}
-  if(flashIdx>=flashDeck.length){
-    const pct=Math.round(flashGood/(flashDeck.length||1)*100);
-    el.innerHTML=`<div class="done-wrap"><div class="done-icon">${pct>=80?'🎉':pct>=50?'👍':'📚'}</div><h2>${pct>=80?L.doneXs:pct>=50?L.doneGood:L.doneNeed}</h2><p>${L.doneTxt} <b>${flashGood}/${flashDeck.length}</b> ${L.doneTxt2} (${pct}%)<br>${L.doneChua}: <b>${flashBad}</b> ${L.doneTxt2}</p><button class="restart-btn" onclick="initFlash()">${L.restartBtn}</button></div>`;
-    return;
-  }
-  const w=flashDeck[flashIdx];
-  const imgSrc=IMGS[w.id]||'';
-  const imgHtml=imgSrc?`<div class="fc-img-wrap"><img class="fc-img" src="${imgSrc}"></div>`:'';
-  let frontMain,frontSub;
-  if(flashMode==='vn'){frontMain=`<div class="fc-main">${w.viet}</div>`;frontSub=`<div class="fc-sub">${w.group}</div>`;}
-  else{frontMain=`<div class="fc-main" style="font-family:'Noto Sans JP',sans-serif">${w.kanji}</div>`;frontSub=`<div class="fc-sub" style="font-family:'Noto Sans JP',sans-serif">${w.hira}</div>`;}
-  el.innerHTML=`
-    <div class="tap-hint">${L.tapHint} (${flashIdx+1}/${flashDeck.length})</div>
-    <div class="card-wrap" onclick="flipCard()">
-      <div class="fc${flashFlipped?' flipped':''}">
-        <div class="fc-face fc-front">
-          <div class="fc-hint">${L.frontHint}</div>
-          ${frontMain}${frontSub}
+    <div class="app-container">
+        <h2>Bảng Điều Khiển / Nhập Liệu</h2>
+        
+        <div class="form-group">
+            <label for="inputData">Nhập thông tin dữ liệu:</label>
+            <input type="text" id="inputData" placeholder="Nhập nội dung tại đây...">
         </div>
-        <div class="fc-face fc-back">
-          <div class="fc-hint">${L.backHint}</div>
-          ${imgHtml}
-          <div class="fc-back-viet">${w.viet}</div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:8px">
-            <div class="fc-back-jp">${w.kanji}</div>
-            <button class="speak-btn" onclick="event.stopPropagation();speak('${w.hira}')">🔊</button>
-          </div>
-          <div class="fc-back-hira">${w.hira}</div>
-          <div class="fc-back-note">${w.note}</div>
-          <div class="fc-back-group">${w.group}</div>
+        
+        <button id="btnSubmit">Xử lý dữ liệu</button>
+
+        <div class="result-box">
+            <strong>Trạng thái hệ thống:</strong> 
+            <span id="outputStatus">Đang chờ nhập liệu...</span>
         </div>
-      </div>
     </div>
-    ${flashFlipped?`<div class="flash-actions">
-      <button class="flash-btn wrong" onclick="answerCard(false)"><span class="bi">❌</span><span class="bl">${L.btnWrong}</span></button>
-      <button class="flash-btn good" onclick="answerCard(true)"><span class="bi">✅</span><span class="bl">${L.btnGood}</span></button>
-    </div>`:`<div style="text-align:center;color:var(--muted);font-size:12px;margin-top:8px">${L.flipHint}</div>`}`;
-  updateFlashStats();
-}
 
-function flipCard(){flashFlipped=!flashFlipped;renderFlashCard();}
+    <script>
+        // Chờ giao diện tải xong hoàn toàn mới chạy code xử lý
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            const btn = document.getElementById("btnSubmit");
+            const input = document.getElementById("inputData");
+            const output = document.getElementById("outputStatus");
 
-function answerCard(correct){
-  recordAnswer(correct,flashDeck[flashIdx].id);
-  if(!correct){flashBad++;flashDeck.push(flashDeck[flashIdx]);}else flashGood++;
-  flashIdx++;flashFlipped=false;renderFlashCard();
-}
+            // Bắt sự kiện khi click vào nút nút Xử lý
+            btn.addEventListener("click", function() {
+                const value = input.value.trim();
 
-// ===== QUIZ =====
-let quizType='mc',quizPool=[],quizIdx=0,quizCorrect=0,quizWrong=0,mcAnswered=false;
-let matchLeftSel=null,matchRightSel=null,matchPairs=[];
+                if (value === "") {
+                    output.innerText = "Vui lòng không để trống dữ liệu!";
+                    output.style.color = "#dc2626"; // Màu đỏ cảnh báo
+                } else {
+                    // Thực hiện logic xử lý của bạn ở đây (ví dụ: hiển thị lại dữ liệu)
+                    output.innerText = `Đã ghi nhận dữ liệu thành công: "${value}"`;
+                    output.style.color = "#16a34a"; // Màu xanh thành công
+                }
+            });
 
-function setQuizType(t){
-  quizType=t;
-  document.getElementById('qTypeBtn1').classList.toggle('active',t==='mc');
-  document.getElementById('qTypeBtn2').classList.toggle('active',t==='match');
-  initQuiz();
-}
-
-function initQuiz(){
-  const grp=document.getElementById('quizGroupSel').value;
-  let pool;
-  if(grp==='all') pool=[...WORDS];
-  else if(grp==='fav') pool=WORDS.filter(w=>favorites.includes(w.id));
-  else if(grp==='smart') pool=getSmartDeck();
-  else pool=WORDS.filter(w=>w.group===grp);
-  quizPool=(pool.length?pool:[...WORDS]).sort(()=>Math.random()-.5);
-  quizIdx=0;quizCorrect=0;quizWrong=0;mcAnswered=false;
-  updateQuizStats();renderQuiz();
-}
-
-function updateQuizStats(){
-  document.getElementById('qsTotal').textContent=quizPool.length;
-  document.getElementById('qsCorrect').textContent=quizCorrect;
-  document.getElementById('qsWrong').textContent=quizWrong;
-  document.getElementById('quizBar').style.width=(quizPool.length?Math.round((quizCorrect+quizWrong)/quizPool.length*100):0)+'%';
-}
-
-function renderQuiz(){if(quizType==='mc')renderMC();else renderMatch();}
-
-function renderMC(){
-  const el=document.getElementById('quizContent');
-  const L=LANG[currentLang];
-  if(!quizPool.length){el.innerHTML=`<div class="empty-wrap"><div style="font-size:48px">📭</div><p>${L.emptyMsg}</p></div>`;return;}
-  if(quizIdx>=quizPool.length){showQuizDone(el);return;}
-  const correct=quizPool[quizIdx];
-  const others=quizPool.filter(w=>w.id!==correct.id).sort(()=>Math.random()-.5).slice(0,3);
-  const opts=[correct,...others].sort(()=>Math.random()-.5);
-  const showJP=Math.random()>0.5;
-  const imgSrc=IMGS[correct.id]||'';
-  const imgHtml=imgSrc?`<div class="mc-img-wrap"><img class="mc-img" src="${imgSrc}"></div>`:'';
-  mcAnswered=false;
-  el.innerHTML=`<div class="mc-card">
-    <div class="mc-qnum">${currentLang==='vn'?'Câu':'問題'} ${quizIdx+1} / ${quizPool.length}</div>
-    ${imgHtml}
-    <div class="mc-q${showJP?' jp':''}">${showJP?correct.kanji:correct.viet}</div>
-    ${showJP?`<div class="mc-sub">${correct.hira} <button class="speak-btn" onclick="speak('${correct.hira}')">🔊</button></div>`:''}
-    <div class="mc-opts">
-      ${opts.map(o=>`<button class="mc-opt" data-id="${o.id}" data-correct="${correct.id}" onclick="answerMC(this)">
-        ${showJP?o.viet:o.kanji}${!showJP?`<br><span style="font-size:11px;font-family:'Noto Sans JP',sans-serif;opacity:.7">${o.hira}</span>`:''}
-      </button>`).join('')}
-    </div>
-    <div id="mcFeedback"></div>
-  </div>`;
-}
-
-function answerMC(btn){
-  if(mcAnswered)return;
-  mcAnswered=true;
-  const chosen=btn.dataset.id,correctId=btn.dataset.correct;
-  const isOk=chosen===correctId;
-  const L=LANG[currentLang];
-  recordAnswer(isOk,correctId);
-  document.querySelectorAll('.mc-opt').forEach(o=>o.classList.add('disabled'));
-  btn.classList.add(isOk?'correct':'wrong');
-  if(!isOk) document.querySelectorAll('.mc-opt').forEach(o=>{if(o.dataset.id===correctId)o.classList.add('correct');});
-  if(isOk)quizCorrect++;else quizWrong++;
-  updateQuizStats();
-  const fb=document.getElementById('mcFeedback');
-  fb.className='mc-fb '+(isOk?'ok':'fail');
-  fb.innerHTML=isOk?L.mcCorrect:L.mcWrong;
-  fb.insertAdjacentHTML('afterend',`<button class="mc-next" onclick="nextMC()">${L.mcNext}</button>`);
-}
-
-function nextMC(){quizIdx++;mcAnswered=false;renderQuiz();}
-
-const MATCH_SIZE=5;
-function renderMatch(){
-  const el=document.getElementById('quizContent');
-  const L=LANG[currentLang];
-  if(!quizPool.length||quizIdx>=quizPool.length){showQuizDone(el);return;}
-  const batch=quizPool.slice(quizIdx,quizIdx+MATCH_SIZE);
-  matchPairs=batch.map(w=>({id:w.id,viet:w.viet,kanji:w.kanji,hira:w.hira}));
-  matchLeftSel=null;matchRightSel=null;
-  const lefts=[...matchPairs].sort(()=>Math.random()-.5);
-  const rights=[...matchPairs].sort(()=>Math.random()-.5);
-  el.innerHTML=`<div class="match-wrap">
-    <div class="match-title">${L.matchTitle}</div>
-    <div class="match-cols">
-      <div class="match-col">
-        <div class="match-lbl">${L.matchLbl1}</div>
-        ${lefts.map(w=>`<div class="match-item" id="ml_${w.id}" onclick="selectMatch('left','${w.id}')">${w.viet}</div>`).join('')}
-      </div>
-      <div class="match-col">
-        <div class="match-lbl">${L.matchLbl2}</div>
-        ${rights.map(w=>`<div class="match-item jp" id="mr_${w.id}" onclick="selectMatch('right','${w.id}')">${w.kanji}<br><span style="font-size:11px;opacity:.7">${w.hira}</span></div>`).join('')}
-      </div>
-    </div>
-    <div id="matchFeedback" style="text-align:center;margin-top:10px;font-size:13px;font-weight:600;color:var(--muted)"></div>
-    <button class="match-next" id="matchNextBtn" onclick="renderMatch()" style="display:none">${L.matchNext}</button>
-  </div>`;
-}
-
-function selectMatch(side,id){
-  const el=document.getElementById(side==='left'?`ml_${id}`:`mr_${id}`);
-  if(el.classList.contains('matched-ok'))return;
-  if(side==='left'){
-    if(matchLeftSel)document.getElementById(`ml_${matchLeftSel}`)?.classList.remove('selected');
-    matchLeftSel=id;el.classList.add('selected');
-  }else{
-    if(matchRightSel)document.getElementById(`mr_${matchRightSel}`)?.classList.remove('selected');
-    matchRightSel=id;el.classList.add('selected');
-  }
-  if(matchLeftSel&&matchRightSel){
-    const lEl=document.getElementById(`ml_${matchLeftSel}`);
-    const rEl=document.getElementById(`mr_${matchRightSel}`);
-    const L=LANG[currentLang];
-    if(matchLeftSel===matchRightSel){
-      lEl.classList.remove('selected');lEl.classList.add('matched-ok');lEl.style.pointerEvents='none';
-      rEl.classList.remove('selected');rEl.classList.add('matched-ok');
-      recordAnswer(true,matchLeftSel);quizCorrect++;updateQuizStats();
-      const allDone=matchPairs.every(p=>document.getElementById(`ml_${p.id}`)?.classList.contains('matched-ok'));
-      if(allDone){
-        quizIdx+=MATCH_SIZE;
-        const fb=document.getElementById('matchFeedback');
-        fb.innerHTML=L.matchDone;fb.style.color='#27AE60';
-        const nb=document.getElementById('matchNextBtn');
-        nb.textContent=L.matchNext;nb.style.display='block';
-      }
-    }else{
-      lEl.classList.remove('selected');lEl.classList.add('matched-fail');
-      rEl.classList.remove('selected');rEl.classList.add('matched-fail');
-      recordAnswer(false,matchLeftSel);quizWrong++;updateQuizStats();
-      setTimeout(()=>{lEl.classList.remove('matched-fail');rEl.classList.remove('matched-fail');},700);
-    }
-    matchLeftSel=null;matchRightSel=null;
-  }
-}
-
-function showQuizDone(el){
-  const pct=Math.round(quizCorrect/((quizCorrect+quizWrong)||1)*100);
-  const L=LANG[currentLang];
-  el.innerHTML=`<div class="done-wrap"><div class="done-icon">${pct>=80?'🏆':pct>=50?'👍':'📚'}</div><h2>${pct>=80?L.quizDoneXs:pct>=50?L.quizDoneGood:L.quizDoneNeed}</h2><p>${L.quizDoneRight}: <b>${quizCorrect}</b> — ${L.quizDoneWrong}: <b>${quizWrong}</b><br>${L.quizDonePct} <b>${pct}%</b></p><button class="restart-btn" onclick="initQuiz()">${L.quizRestart}</button></div>`;
-}
-
-// KHỞI ĐỘNG
-setLang(currentLang);
-setMode('flash');
-</script>
+        });
+    </script>
 </body>
 </html>
