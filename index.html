@@ -379,12 +379,12 @@ const LANG = {
     modalCancel:'キャンセル', modalConfirm:'削除',
     today:'今日', noData:'データなし', weakTimes:'回不正解',
     aboutTitle:'📱 語彙学習アプリ',
-    aboutDesc:'金属プレス加工の専門用語を学ぶアプリです。ベトナム語と日本語で181語を収録、図解付き。',
+    aboutDesc:'金属プレス加工の専門用語 te を学ぶアプリです。ベトナム語と日本語で181語を収録、図解付き。',
     aboutHow:'💡 使い方', aboutSave:'📱 ホーム画面に追加',
     aboutIOS:'<b>iPhone:</b> 共有ボタン → 「ホーム画面に追加」',
     aboutAND:'<b>Android:</b> メニュー ⋮ → 「ホーム画面に追加」',
     tapHint:'👆 カードをタップして裏返す',
-    frontHint:'この単語を覚えていますか？', backHint:'答え',
+    frontHint:'この単語 te を覚えていますか？', backHint:'答え',
     flipHint:'評価する前にカードを裏返してください',
     btnWrong:'未定着', btnGood:'覚えた',
     doneXs:'素晴らしい！', doneGood:'よくできました！', doneNeed:'要復習！',
@@ -577,8 +577,9 @@ function renderStats() {
   }).join(''):`<p style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0">${L.noData}</p>`;
 }
 
-// ===== FLASHCARD (ĐÃ ĐƯỢC TỐI ƯU THUẬT TOÁN 5 CÂU) =====
-let flashPool=[], currentQueue=[], flashIdx=0, flashGood=0, flashBad=0, flashMode='vn', flashFlipped=false;
+// ===== FLASHCARD (SỬA LỖI KẸT 5 TỪ VÀ TỐI ƯU CUỐN CHIẾU) =====
+let flashPool=[], currentQueue=[], flashGood=0, flashBad=0, flashMode='vn', flashFlipped=false;
+let currentIndexInQueue = 0; // Vị trí thẻ đang hiển thị trong Queue 5 từ
 let continuousWrongCount = 0; // Bộ đếm phạt sai liên tiếp
 
 function setFlashMode(m){
@@ -599,41 +600,35 @@ function initFlash(){
   // Trộn đều kho dữ liệu tổng được chọn ban đầu
   flashPool=(pool.length?pool:[...WORDS]).sort(()=>Math.random()-.5);
   
-  flashIdx=0;
   flashGood=0;
   flashBad=0;
   flashFlipped=false;
   continuousWrongCount = 0;
-  
-  // Khởi động cụm 5 từ đầu tiên từ kho dữ liệu tổng
-  loadNextSessionGroup();
-}
-
-// Hàm nạp cụm 5 từ tiếp theo từ kho dữ liệu tổng vào hàng đợi học cuốn chiếu
-function loadNextSessionGroup() {
-  currentQueue = [];
-  for(let i = 0; i < 5; i++) {
-    if(flashIdx < flashPool.length) {
-      currentQueue.push({...flashPool[flashIdx]});
-      flashIdx++;
-    }
-  }
-  // Reset con trỏ vị trí hiển thị hiện tại trong cụm 5 từ về từ đầu tiên
   currentIndexInQueue = 0;
+  currentQueue = [];
   
+  // Khởi tạo nạp đầy 5 câu ban đầu vào hàng đợi (Queue)
+  refillQueue();
   updateFlashStats();
   renderFlashCard();
 }
 
+// Hàm tự động duy trì nạp đắp từ mới từ Pool tổng vào cụm 5 từ đang học
+function refillQueue() {
+  while (currentQueue.length < 5 && flashPool.length > 0) {
+    currentQueue.push(flashPool.shift()); // Lấy từ đầu tiên của kho tổng đưa vào hàng đợi
+  }
+}
+
 function updateFlashStats(){
-  // Số từ còn lại của cả lượt học bằng: Số từ chưa bốc từ Pool + Số từ chưa thuộc trong cụm hiện tại
-  const totalRemaining = Math.max(0, flashPool.length - flashIdx) + currentQueue.length;
+  // Tổng số từ chưa thuộc = Số từ đang xếp hàng đợi (Queue) + Số từ còn nằm trong Pool tổng
+  const totalRemaining = currentQueue.length + flashPool.length;
   document.getElementById('fsTotal').textContent = totalRemaining;
   document.getElementById('fsGood').textContent = flashGood;
   document.getElementById('fsBad').textContent = flashBad;
   
-  // Thanh Progress tính tiến độ dựa trên số từ tổng đã thuộc hoàn toàn
-  const totalWordsCount = flashPool.length;
+  // Thanh Progress tính tiến độ dựa trên số từ tổng đã lưu trong mảng WORDS (hoặc pool ban đầu)
+  const totalWordsCount = WORDS.length;
   document.getElementById('flashBar').style.width = (totalWordsCount ? Math.round(flashGood / totalWordsCount * 100) : 0) + '%';
 }
 
@@ -641,17 +636,17 @@ function renderFlashCard(){
   const el=document.getElementById('flashContent');
   const L=LANG[currentLang];
   
-  // Nếu cả mảng Pool tổng và cụm từ hiện tại đều hết sạch dữ liệu -> Hoàn thành bài học
-  if(!flashPool.length && !currentQueue.length){
-    el.innerHTML=`<div class="empty-wrap"><div style="font-size:48px">📭</div><p>${L.emptyMsg}</p></div>`;
-    return;
-  }
-  
-  if(currentQueue.length === 0 && flashIdx >= flashPool.length){
-    const totalWordsCount = flashPool.length || 1;
+  // Trường hợp hoàn thành: Cả hàng đợi và Pool đều trống rỗng
+  if(currentQueue.length === 0 && flashPool.length === 0){
+    const totalWordsCount = WORDS.length || 1;
     const pct=Math.round(flashGood / totalWordsCount * 100);
     el.innerHTML=`<div class="done-wrap"><div class="done-icon">${pct>=80?'🎉':pct>=50?'👍':'📚'}</div><h2>${pct>=80?L.doneXs:pct>=50?L.doneGood:L.doneNeed}</h2><p>${L.doneTxt} <b>${flashGood}/${totalWordsCount}</b> ${L.doneTxt2} (${pct}%)<br>${L.doneChua}: <b>${flashBad}</b> ${L.doneTxt2}</p><button class="restart-btn" onclick="initFlash()">${L.restartBtn}</button></div>`;
     return;
+  }
+  
+  // Kiểm tra an toàn chỉ số mảng
+  if(currentIndexInQueue >= currentQueue.length) {
+    currentIndexInQueue = 0;
   }
   
   const w=currentQueue[currentIndexInQueue];
@@ -661,7 +656,6 @@ function renderFlashCard(){
   if(flashMode==='vn'){frontMain=`<div class="fc-main">${w.viet}</div>`;frontSub=`<div class="fc-sub">${w.group}</div>`;}
   else{frontMain=`<div class="fc-main" style="font-family:'Noto Sans JP',sans-serif">${w.kanji}</div>`;frontSub=`<div class="fc-sub" style="font-family:'Noto Sans JP',sans-serif">${w.hira}</div>`;}
   
-  // Tính tổng số lượng từ hiện tại để hiển thị số thứ tự thẻ (ví dụ 1/5)
   el.innerHTML=`
     <div class="tap-hint">${L.tapHint} (${currentIndexInQueue+1}/${currentQueue.length})</div>
     <div class="card-wrap" onclick="flipCard()">
@@ -699,48 +693,54 @@ function answerCard(correct){
   recordAnswer(correct, currentQueue[currentIndexInQueue].id);
   
   if (correct) {
-    // THUỘC BÀI: Xoá hẳn khỏi hàng đợi 5 câu hiện tại
+    // SỬA LỖI TẠI ĐÂY: Xóa từ đã thuộc ra khỏi Queue 5 từ lập tức
     currentQueue.splice(currentIndexInQueue, 1);
     flashGood++;
-    continuousWrongCount = 0; // Reset số lần sai liên tiếp về 0
+    continuousWrongCount = 0; // Đã thuộc -> reset chuỗi sai liên tiếp
     
-    // Nếu cụm 5 từ cũ đã thuộc sạch bóng, tiến hành nạp bộ 5 câu mới
-    if (currentQueue.length === 0) {
+    // Nạp gối đầu 1 từ mới từ Pool tổng lên thay thế để Queue luôn duy trì tối đa 5 từ
+    refillQueue();
+    
+    // Nếu sau khi xóa, Queue rỗng (đã học hết hoàn toàn kho từ)
+    if(currentQueue.length === 0) {
       flashFlipped = false;
-      loadNextSessionGroup();
+      renderFlashCard();
       return;
     }
+    
+    // Đảm bảo con trỏ không bị vượt ngưỡng chiều dài mảng mới sau khi xóa phần tử
+    if (currentIndexInQueue >= currentQueue.length) {
+      currentIndexInQueue = 0;
+    }
   } else {
-    // CHƯA THUỘC: Giữ nguyên từ trong nhóm, tăng bộ đếm sai liên tiếp
+    // CHƯA THUỘC: Giữ nguyên từ đó trong cụm, nhảy con trỏ sang từ tiếp theo
     flashBad++;
     continuousWrongCount++;
     
-    // Nếu bấm sai liên tiếp chạm ngưỡng 10 lần, hiển thị thông báo động viên chặn bấm tiếp
+    // Cảnh báo nếu bấm sai dồn dập 10 lần
     if (continuousWrongCount >= 10) {
       const L = LANG[currentLang];
       document.getElementById('modalTitle').textContent = L.alertTitle;
       document.getElementById('modalMsg').textContent = L.alertMsg;
-      document.getElementById('modalCancel').style.display = 'none'; // Ẩn nút hủy
+      document.getElementById('modalCancel').style.display = 'none';
       const confirmBtn = document.getElementById('modalConfirm');
       confirmBtn.textContent = L.alertBtn;
       
       _modalCallback = () => {
         closeModal();
-        document.getElementById('modalCancel').style.display = 'block'; // Khôi phục trạng thái nút hủy
-        continuousWrongCount = 0; // Reset lại bộ đếm sau khi người dùng xác nhận xong
+        document.getElementById('modalCancel').style.display = 'block';
+        continuousWrongCount = 0;
         renderFlashCard();
       };
       document.getElementById('confirmModal').classList.add('visible');
       return;
     }
     
-    // Di chuyển con trỏ sang từ tiếp theo trong cụm 5 từ
+    // Chuyển sang câu tiếp theo trong cụm 5 từ để lặp vòng tròn
     currentIndexInQueue++;
-  }
-  
-  // Thuật toán vòng tròn: Nếu con trỏ vượt quá độ dài mảng cụm hiện tại, quay lại từ số 0
-  if (currentIndexInQueue >= currentQueue.length) {
-    currentIndexInQueue = 0;
+    if (currentIndexInQueue >= currentQueue.length) {
+      currentIndexInQueue = 0;
+    }
   }
   
   flashFlipped=false;
