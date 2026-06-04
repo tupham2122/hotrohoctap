@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Học Từ Vựng Dập Kim Loại</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght=400;700&family=Be+Vietnam+Pro:wght=400;600;700&display=swap');
 :root{
   --red:#C0392B;--navy:#1A2557;--navy-mid:#253275;
   --gold:#D4AC0D;--gold-light:#FEF9E7;--bg:#F5F6FA;--card:#FFFFFF;
@@ -127,27 +127,32 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .match-item.matched-fail{border-color:var(--red);background:#FADBD8;color:var(--red)}
 .match-next{width:100%;padding:13px;border-radius:12px;border:none;background:var(--navy);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px}
 
-/* STATS */
+/* STATS NÂNG CẤP */
 .stats-hdr{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:14px}
+.stats-tabs{display:flex;background:var(--border);padding:3px;border-radius:10px;margin-bottom:14px}
+.stats-tab-btn{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:700;border:none;background:transparent;color:var(--muted);border-radius:8px;cursor:pointer}
+.stats-tab-btn.active{background:#fff;color:var(--navy);box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+.stats-sub-panel{display:none}
+.stats-sub-panel.visible{display:block}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .stats-box{background:#fff;border-radius:14px;padding:14px;box-shadow:var(--shadow);text-align:center}
-.stats-num{font-size:30px;font-weight:700;line-height:1;color:var(--navy)}
-.stats-num.green{color:#27AE60}.stats-num.red{color:var(--red)}.stats-num.gold{color:var(--gold)}
+.stats-num{font-size:28px;font-weight:700;line-height:1;color:var(--navy)}
+.stats-num.green{color:#27AE60}.stats-num.red{color:var(--red)}.stats-num.gold{color:var(--gold)}.stats-num.blue{color:var(--navy)}
 .stats-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600}
 .stats-section{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
 .stats-section h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.bar-lbl{font-size:12px;color:var(--muted);min-width:60px;font-weight:600}
+.bar-lbl{font-size:12px;color:var(--muted);min-width:65px;font-weight:600}
 .bar-wrap{flex:1;background:var(--border);border-radius:4px;height:8px;overflow:hidden}
 .bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
-.bar-fill.green{background:#27AE60}.bar-fill.red{background:var(--red)}
+.bar-fill.green{background:#27AE60}.bar-fill.red{background:var(--red)}.bar-fill.blue{background:var(--navy)}
 .bar-val{font-size:12px;font-weight:700;min-width:36px;text-align:right}
 .day-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
 .day-row:last-child{border-bottom:none}
 .day-date{font-size:12px;color:var(--muted);font-weight:600}
 .day-info{display:flex;gap:12px}
 .day-info span{font-size:12px;font-weight:700}
-.day-info .g{color:#27AE60}.day-info .r{color:var(--red)}
+.day-info .g{color:#27AE60}.day-info .r{color:var(--red)}.day-info .b{color:var(--navy)}
 .stats-reset-btn{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;margin-top:4px}
 .smart-badge{display:inline-block;background:var(--gold-light);color:#7D6608;border:1px solid #F9E79F;font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;margin-left:6px}
 
@@ -243,29 +248,67 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 
 <div class="panel" id="panelStats">
   <div class="stats-hdr" id="statsTitle">📊 Thống kê học tập</div>
-  <div class="stats-grid">
-    <div class="stats-box"><div class="stats-num gold" id="stStreak">0</div><div class="stats-lbl" id="lblStreak">🔥 Ngày liên tiếp</div></div>
-    <div class="stats-box"><div class="stats-num" id="stTotal">0</div><div class="stats-lbl" id="lblTotalSessions">📚 Tổng lượt học</div></div>
-    <div class="stats-box"><div class="stats-num green" id="stCorrect">0</div><div class="stats-lbl" id="lblTotalCorrect">✅ Trả lời đúng</div></div>
-    <div class="stats-box"><div class="stats-num red" id="stWrong">0</div><div class="stats-lbl" id="lblTotalWrong">❌ Trả lời sai</div></div>
+  
+  <div class="stats-tabs">
+    <button class="stats-tab-btn active" id="tabFlashBtn" onclick="switchStatsTab('flash')">🃏 Flashcard</button>
+    <button class="stats-tab-btn" id="tabQuizBtn" onclick="switchStatsTab('quiz')">📝 Kiểm tra</button>
   </div>
-  <div class="stats-section">
-    <h3 id="lblAccuracy">🎯 Tỉ lệ đúng tổng</h3>
-    <div class="bar-row">
-      <span class="bar-lbl" id="lblRight">Đúng</span>
-      <div class="bar-wrap"><div class="bar-fill green" id="stBarGood" style="width:0%"></div></div>
-      <span class="bar-val" id="stPct">0%</span>
+
+  <!-- THỐNG KÊ FLASHCARD -->
+  <div class="stats-sub-panel visible" id="statsSubFlash">
+    <div class="stats-grid">
+      <div class="stats-box"><div class="stats-num gold" id="stFlashStreak">0</div><div class="stats-lbl" id="lblFlashStreak">🔥 Ngày liên tiếp</div></div>
+      <div class="stats-box"><div class="stats-num blue" id="stFlashTotal">0</div><div class="stats-lbl" id="lblFlashTotalCards">🎴 Số thẻ đã lật</div></div>
+      <div class="stats-box"><div class="stats-num green" id="stFlashGood">0</div><div class="stats-lbl" id="lblFlashGood">✅ Số từ đã thuộc</div></div>
+      <div class="stats-box"><div class="stats-num red" id="stFlashBad">0</div><div class="stats-lbl" id="lblFlashBad">❌ Từ chưa thuộc</div></div>
     </div>
-    <div class="bar-row">
-      <span class="bar-lbl" id="lblWrong2">Sai</span>
-      <div class="bar-wrap"><div class="bar-fill red" id="stBarBad" style="width:0%"></div></div>
-      <span class="bar-val" id="stPctW">0%</span>
+    <div class="stats-section">
+      <h3 id="lblFlashRatioTitle">🎯 Tỉ lệ thuộc bài</h3>
+      <div class="bar-row">
+        <span class="bar-lbl" id="lblFlashRatioGood">Đã thuộc</span>
+        <div class="bar-wrap"><div class="bar-fill green" id="stFlashBarGood" style="width:0%"></div></div>
+        <span class="bar-val" id="stFlashPctGood">0%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl" id="lblFlashRatioBad">Chưa thuộc</span>
+        <div class="bar-wrap"><div class="bar-fill red" id="stFlashBarBad" style="width:0%"></div></div>
+        <span class="bar-val" id="stFlashPctBad">0%</span>
+      </div>
+    </div>
+    <div class="stats-section">
+      <h3 id="lblFlashHistoryTitle">📅 Lịch sử học Flashcard (7 ngày)</h3>
+      <div id="stFlashHistory"></div>
     </div>
   </div>
-  <div class="stats-section">
-    <h3 id="lblHistory">📅 Lịch sử 7 ngày gần nhất</h3>
-    <div id="stHistory"></div>
+
+  <!-- THỐNG KÊ KIỂM TRA -->
+  <div class="stats-sub-panel" id="statsSubQuiz">
+    <div class="stats-grid">
+      <div class="stats-box"><div class="stats-num gold" id="stQuizStreak">0</div><div class="stats-lbl" id="lblQuizStreak">🔥 Ngày liên tiếp</div></div>
+      <div class="stats-box"><div class="stats-num blue" id="stQuizTotal">0</div><div class="stats-lbl" id="lblQuizTotal">📚 Tổng số câu làm</div></div>
+      <div class="stats-box"><div class="stats-num green" id="stQuizCorrect">0</div><div class="stats-lbl" id="lblQuizCorrect">✅ Trả lời đúng</div></div>
+      <div class="stats-box"><div class="stats-num red" id="stQuizWrong">0</div><div class="stats-lbl" id="lblQuizWrong">❌ Trả lời sai</div></div>
+    </div>
+    <div class="stats-section">
+      <h3 id="lblQuizRatioTitle">🎯 Tỉ lệ đúng kiểm tra</h3>
+      <div class="bar-row">
+        <span class="bar-lbl" id="lblQuizRatioGood">Đúng</span>
+        <div class="bar-wrap"><div class="bar-fill green" id="stQuizBarGood" style="width:0%"></div></div>
+        <span class="bar-val" id="stQuizPctGood">0%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl" id="lblQuizRatioBad">Sai</span>
+        <div class="bar-wrap"><div class="bar-fill red" id="stQuizBarBad" style="width:0%"></div></div>
+        <span class="bar-val" id="stQuizPctBad">0%</span>
+      </div>
+    </div>
+    <div class="stats-section">
+      <h3 id="lblQuizHistoryTitle">📅 Lịch sử làm kiểm tra (7 ngày)</h3>
+      <div id="stQuizHistory"></div>
+    </div>
   </div>
+
+  <!-- PHẦN CHUNG: TỪ HAY SAI -->
   <div class="stats-section">
     <h3 id="lblWeakTitle">⚠️ Từ cần ôn lại <span class="smart-badge" id="lblWeakBadge">hay sai nhất</span></h3>
     <div id="stWeakWords"></div>
@@ -283,7 +326,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
     <ul id="aboutList">
       <li><b>🃏 Flashcard:</b> Lật thẻ, đánh giá mức độ thuộc bài</li>
       <li><b>📝 Kiểm tra:</b> Trắc nghiệm 4 đáp án hoặc nối từ</li>
-      <li><b>📊 Thống kê:</b> Theo dõi tiến độ học tập theo ngày</li>
+      <li><b>📊 Thống kê:</b> Theo dõi tiến độ học tập độc lập cho Flashcard và Kiểm tra</li>
       <li><b>🔊 Phát âm:</b> Bấm nút loa để nghe tiếng Nhật</li>
       <li><b>🧠 Ôn tập thông minh:</b> App tự ưu tiên từ hay sai</li>
     </ul>
@@ -303,7 +346,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 </div>
 
 <script>
-// ===== KHAI BÁO TOÀN BỘ 181 DỮ LIỆU TỪ VỰNG CHUYÊN NGÀNH DẬP =====
 const WORDS = [
   {id:1,viet:"Bavia",kanji:"バリ",hira:"ばり",note:"Ba via / xỉa kim loại sau dập",group:"⚙️ Gia công"},
   {id:2,viet:"Bàn ren",kanji:"ダイ",hira:"だい",note:"Khuôn dập (die)",group:"🔩 Khuôn"},
@@ -314,7 +356,7 @@ const WORDS = [
   {id:7,viet:"Bước tiến",kanji:"送りピッチ",hira:"おくりぴっち",note:"Feed pitch — bước tiến nguyên liệu",group:"⚙️ Gia công"},
   {id:8,viet:"Bạt mép",kanji:"チッピング",hira:"ちっぴんぐ",note:"Chipping — mẻ, bạt góc cạnh khuôn",group:"⚙️ Gia công"},
   {id:9,viet:"Bật lò xo",kanji:"スプリングバック",hira:"すぷりんぐばっく",note:"Springback — đàn hồi lại sau khi uốn",group:"⚙️ Gia công"},
-  {id:10,viet:"Bật ra",kanji:"ノックアウト",hira:"のっくあうと",note:"Knockout — cơ cấu đẩy sản phẩm ra khỏi khuôn",group:"🔩 Khuôn"},
+  {id:10,viet:"Bật ra",kanji:"ノックアウト",hira:"ノックアウト",note:"Knockout — cơ cấu đẩy sản phẩm ra khỏi khuôn",group:"🔩 Khuôn"},
   {id:11,viet:"Bề mặt bị hư hại",kanji:"破断面",hira:"はだんめん",note:"Fractured surface — bề mặt gãy vỡ sau cắt",group:"⚙️ Gia công"},
   {id:12,viet:"Bề mặt cắt nghiền",kanji:"せん断面",hira:"せんだんめん",note:"Shear surface — mặt cắt do lực cắt nghiền",group:"⚙️ Gia công"},
   {id:13,viet:"Bề mặt trục quay",kanji:"スピンドル面",hira:"すぴんどるめん",note:"Spindle face — mặt trục chính máy đo",group:"📏 Đo lường"},
@@ -337,7 +379,7 @@ const WORDS = [
   {id:30,viet:"Cơ cấu cấp liệu kiểu con lăn",kanji:"ロールフィーダ",hira:"ろーるふぃーだ",note:"Roll feeder — cấp liệu bằng con lăn",group:"🔧 Máy móc"},
   {id:31,viet:"Cơ cấu khuỷu (toggle)",kanji:"トッグル機構",hira:"とっぐるきこう",note:"Toggle mechanism — cơ cấu đòn khuỷu",group:"🔧 Máy móc"},
   {id:32,viet:"Cơ cấu điểm dừng hành trình đơn",kanji:"一行程一停止機構",hira:"いちhこうていいちていしきこう",note:"Single stroke stop mechanism",group:"🛡️ An toàn"},
-  {id:33,viet:"Cấu tạo bố trí ngược",kanji:"逆配置の構造",hira:"ぎゃくはいちのこうぞう",note:"Inverted die structure — kết cấu khuôn đảo ngược",group:"🔩 Khuôn"},
+  {id:33,viet:"Cấu tạo bố trí ngược",kanji:"逆配置の構造",hira:"ぎゃくはいchのこうぞう",note:"Inverted die structure — kết cấu khuôn đảo ngược",group:"🔩 Khuôn"},
   {id:34,viet:"Cắt",kanji:"切断",hira:"せつだん",note:"Cutting — cắt đứt vật liệu",group:"⚙️ Gia công"},
   {id:35,viet:"Cắt mép",kanji:"縁切り",hira:"ふちきり",note:"Edge cutting — cắt mép / viền sản phẩm",group:"⚙️ Gia công"},
   {id:36,viet:"Cữ chặn có bánh cóc",kanji:"ラチェットストップ",hira:"らちぇっとすとっぷ",note:"Ratchet stop — cữ chặn dạng bánh cóc",group:"🔩 Khuôn"},
@@ -371,7 +413,7 @@ const WORDS = [
   {id:64,viet:"Hớt bavia",kanji:"バーリング",hira:"ばーりんぐ",note:"Burring — tạo gờ quanh lỗ (burring)",group:"⚙️ Gia công"},
   {id:65,viet:"Khe hở",kanji:"クリアランス",hira:"くりあらんす",note:"Clearance — khe hở giữa chày và cối khuôn",group:"🔩 Khuôn"},
   {id:66,viet:"Khung chữ C",kanji:"C形フレーム",hira:"しーがたふれーむ",note:"C-frame — khung thân máy dạng chữ C",group:"🔧 Máy móc"},
-  {id:67,viet:"Khung cạnh thẳng",kanji:"ストレートサイド型フレーム",hira:"すとれーとさいどがたふれーむ",note:"Straight-side frame — khung thân máy cạnh thẳng",group:"🔧 Máy móc"},
+  {id:67,viet:"Khung cạnh thẳng",kanji:"ストレートサイド型フレーム",hira:"すとれーtoさいどがたふれーむ",note:"Straight-side frame — khung thân máy cạnh thẳng",group:"🔧 Máy móc"},
   {id:68,viet:"Khuôn có gắn bàn ren",kanji:"ダイセット付き金型",hira:"だいせっとつきかながた",note:"Die with die set — khuôn đã gắn sẵn die set",group:"🔩 Khuôn"},
   {id:69,viet:"Khuôn dập kim loại",kanji:"プレス金型",hira:"ぷれすかながた",note:"Press die — khuôn dập kim loại",group:"🔩 Khuôn"},
   {id:70,viet:"Khuôn dập tổng hợp",kanji:"総抜き型",hira:"そうぬきがた",note:"Compound die — khuôn thực hiện nhiều nguyên công cùng lúc",group:"🔩 Khuôn"},
@@ -488,10 +530,11 @@ const WORDS = [
   {id:181,viet:"Ổ trượt dập",kanji:"プレススライド",hira:"プレススライド",note:"Press slide — ổ trượt chính của máy dập",group:"🔧 Máy móc"}
 ];
 
-const IMGS = {}; // Đường dẫn ảnh bổ sung sau nếu có
+const IMGS = {}; 
 
 // ===== NGÔN NGỮ =====
 let currentLang = localStorage.getItem('lang') || 'vn';
+let activeStatsTab = 'flash';
 
 const LANG = {
   vn: {
@@ -499,13 +542,17 @@ const LANG = {
     lblGroup:'Nhóm:', lblRemain:'Còn lại', lblKnow:'Thuộc', lblDontKnow:'Chưa thuộc',
     lblQuestions:'Câu hỏi', lblCorrect:'Đúng', lblIncorrect:'Sai',
     statsTitle:'📊 Thống kê học tập',
-    lblStreak:'🔥 Ngày liên tiếp', lblTotalSessions:'📚 Tổng lượt học',
-    lblTotalCorrect:'✅ Trả lời đúng', lblTotalWrong:'❌ Trả lời sai',
-    lblAccuracy:'🎯 Tỉ lệ đúng tổng', lblRight:'Đúng', lblWrong2:'Sai',
-    lblHistory:'📅 Lịch sử 7 ngày gần nhất',
+    lblFlashStreak:'🔥 Ngày liên tiếp', lblFlashTotalCards:'🎴 Số thẻ đã lật',
+    lblFlashGood:'✅ Số từ đã thuộc', lblFlashBad:'❌ Từ chưa thuộc',
+    lblFlashRatioTitle:'🎯 Tỉ lệ thuộc bài (Flashcard)', lblFlashRatioGood:'Đã thuộc', lblFlashRatioBad:'Chưa thuộc',
+    lblFlashHistoryTitle:'📅 Lịch sử học Flashcard (7 ngày)',
+    lblQuizStreak:'🔥 Ngày liên tiếp', lblQuizTotal:'📚 Tổng số câu làm',
+    lblQuizCorrect:'✅ Trả lời đúng', lblQuizWrong:'❌ Trả lời sai',
+    lblQuizRatioTitle:'🎯 Tỉ lệ đúng (Kiểm tra)', lblQuizRatioGood:'Đúng', lblQuizRatioBad:'Sai',
+    lblQuizHistoryTitle:'📅 Lịch sử làm kiểm tra (7 ngày)',
     lblWeakTitle:'⚠️ Từ cần ôn lại', lblWeakBadge:'hay sai nhất',
     resetBtn:'🗑️ Xoá dữ liệu thống kê',
-    modalTitle:'Xác nhận xoá', modalMsg:'Toàn bộ dữ liệu thống kê sẽ bị xoá. Bạn có chắc không?',
+    modalTitle:'Xác nhận xoá', modalMsg:'Toàn bộ dữ liệu thống kê sẽ bị xoá hoàn toàn. Bạn có chắc không?',
     modalCancel:'Huỷ', modalConfirm:'Xoá',
     today:'Hôm nay', noData:'Chưa có dữ liệu', weakTimes:'lần sai',
     aboutTitle:'📱 App hỗ trợ học từ vựng',
@@ -539,13 +586,17 @@ const LANG = {
     lblGroup:'グループ:', lblRemain:'残り', lblKnow:'覚えた', lblDontKnow:'未定着',
     lblQuestions:'問題数', lblCorrect:'正解', lblIncorrect:'不正解',
     statsTitle:'📊 項目別統計',
-    lblStreak:'🔥 連続日数', lblTotalSessions:'📚 総学習回数',
-    lblTotalCorrect:'✅ 正解数', lblTotalWrong:'❌ 不正解数',
-    lblAccuracy:'🎯 正解率', lblRight:'正解', lblWrong2:'不正解',
-    lblHistory:'📅 直近7日間の履歴',
+    lblFlashStreak:'🔥 連続日数', lblFlashTotalCards:'🎴 めくった枚数',
+    lblFlashGood:'✅ 覚えた単語数', lblFlashBad:'❌ 未定着の単語数',
+    lblFlashRatioTitle:'🎯 定着率 (フラッシュカード)', lblFlashRatioGood:'覚えた', lblFlashRatioBad:'未定着',
+    lblFlashHistoryTitle:'📅 フラッシュカード履歴 (直近7日間)',
+    lblQuizStreak:'🔥 連続日数', lblQuizTotal:'📚 総回答問題数',
+    lblQuizCorrect:'✅ 正解数', lblQuizWrong:'❌ 不正解数',
+    lblQuizRatioTitle:'🎯 正解率 (テスト)', lblQuizRatioGood:'正解', lblQuizRatioBad:'不正解',
+    lblQuizHistoryTitle:'📅 テスト履歴 (直近7日間)',
     lblWeakTitle:'⚠️ 復習が必要な単語', lblWeakBadge:'最も間違えた',
     resetBtn:'🗑️ 統計データを削除',
-    modalTitle:'削除の確認', modalMsg:'すべての統計データが削除されます。よろしいですか？',
+    modalTitle:'削除の確認', modalMsg:'すべての統計データがリセットされます。よろしいですか？',
     modalCancel:'キャンセル', modalConfirm:'削除',
     today:'今日', noData:'データなし', weakTimes:'回不正解',
     aboutTitle:'📱 語彙学習アプリ',
@@ -582,56 +633,67 @@ function setLang(lang) {
   document.getElementById('langVN').classList.toggle('active', lang==='vn');
   document.getElementById('langJP').classList.toggle('active', lang==='jp');
   const L = LANG[lang];
-  // Nav
+  
+  // Navigation
   document.getElementById('navFlash').textContent = L.navFlash;
   document.getElementById('navQuiz').textContent = L.navQuiz;
   document.getElementById('navStats').textContent = L.navStats;
   document.getElementById('navAbout').textContent = L.navAbout;
-  // Flash labels
+  
+  // Flash & Quiz Common Labels
   document.getElementById('lblGroup').textContent = L.lblGroup;
   document.getElementById('lblGroup2').textContent = L.lblGroup;
   document.getElementById('lblRemain').textContent = L.lblRemain;
   document.getElementById('lblKnow').textContent = L.lblKnow;
   document.getElementById('lblDontKnow').textContent = L.lblDontKnow;
-  // Quiz labels
   document.getElementById('lblQuestions').textContent = L.lblQuestions;
   document.getElementById('lblCorrect').textContent = L.lblCorrect;
   document.getElementById('lblIncorrect').textContent = L.lblIncorrect;
   document.getElementById('qTypeBtn1').textContent = L.qTypeMC;
   document.getElementById('qTypeBtn2').textContent = L.qTypeMatch;
-  // Stats labels
+  
+  // Stats Panel Localized Labels
   document.getElementById('statsTitle').textContent = L.statsTitle;
-  document.getElementById('lblStreak').textContent = L.lblStreak;
-  document.getElementById('lblTotalSessions').textContent = L.lblTotalSessions;
-  document.getElementById('lblTotalCorrect').textContent = L.lblTotalCorrect;
-  document.getElementById('lblTotalWrong').textContent = L.lblTotalWrong;
-  document.getElementById('lblAccuracy').textContent = L.lblAccuracy;
-  document.getElementById('lblRight').textContent = L.lblRight;
-  document.getElementById('lblWrong2').textContent = L.lblWrong2;
-  document.getElementById('lblHistory').textContent = L.lblHistory;
+  document.getElementById('lblFlashStreak').textContent = L.lblFlashStreak;
+  document.getElementById('lblFlashTotalCards').textContent = L.lblFlashTotalCards;
+  document.getElementById('lblFlashGood').textContent = L.lblFlashGood;
+  document.getElementById('lblFlashBad').textContent = L.lblFlashBad;
+  document.getElementById('lblFlashRatioTitle').textContent = L.lblFlashRatioTitle;
+  document.getElementById('lblFlashRatioGood').textContent = L.lblFlashRatioGood;
+  document.getElementById('lblFlashRatioBad').textContent = L.lblFlashRatioBad;
+  document.getElementById('lblFlashHistoryTitle').textContent = L.lblFlashHistoryTitle;
+
+  document.getElementById('lblQuizStreak').textContent = L.lblQuizStreak;
+  document.getElementById('lblQuizTotal').textContent = L.lblQuizTotal;
+  document.getElementById('lblQuizCorrect').textContent = L.lblQuizCorrect;
+  document.getElementById('lblQuizWrong').textContent = L.lblQuizWrong;
+  document.getElementById('lblQuizRatioTitle').textContent = L.lblQuizRatioTitle;
+  document.getElementById('lblQuizRatioGood').textContent = L.lblQuizRatioGood;
+  document.getElementById('lblQuizRatioBad').textContent = L.lblQuizRatioBad;
+  document.getElementById('lblQuizHistoryTitle').textContent = L.lblQuizHistoryTitle;
+
   document.getElementById('lblWeakTitle').childNodes[0].textContent = L.lblWeakTitle + ' ';
   document.getElementById('lblWeakBadge').textContent = L.lblWeakBadge;
   document.getElementById('resetBtn').textContent = L.resetBtn;
-  // About
+  
+  // About Page
   document.getElementById('aboutTitle').textContent = L.aboutTitle;
   document.getElementById('aboutDesc').textContent = L.aboutDesc;
   document.getElementById('aboutHow').textContent = L.aboutHow;
   document.getElementById('aboutSave').textContent = L.aboutSave;
   document.getElementById('aboutIOS').innerHTML = L.aboutIOS;
   document.getElementById('aboutAND').innerHTML = L.aboutAND;
-  // Re-render current panel
+  
   const activePanel = document.querySelector('.panel.visible');
   if (activePanel) {
-    const id = activePanel.id;
-    if (id==='panelFlash') renderFlashCard();
-    else if (id==='panelQuiz') renderQuiz();
-    else if (id==='panelStats') renderStats();
+    if (activePanel.id==='panelFlash') renderFlashCard();
+    else if (activePanel.id==='panelQuiz') renderQuiz();
+    else if (activePanel.id==='panelStats') renderStats();
   }
 }
 
 // ===== MODAL =====
 let _modalCallback = null;
-
 function showResetModal() {
   const L = LANG[currentLang];
   document.getElementById('modalTitle').textContent = L.modalTitle;
@@ -645,26 +707,33 @@ function showResetModal() {
   };
   document.getElementById('confirmModal').classList.add('visible');
 }
-
 document.getElementById('modalConfirm').onclick = () => { if(_modalCallback) _modalCallback(); };
 function closeModal() { document.getElementById('confirmModal').classList.remove('visible'); _modalCallback=null; }
 document.getElementById('confirmModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
 
-// ===== NAVIGATION =====
+// ===== NAVIGATION PANELS =====
 function setMode(m) {
   document.querySelectorAll('.nav-btn').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('visible'));
   const navEl = document.getElementById('nav-'+m);
   if(navEl) navEl.classList.add('active');
-  const panelId = 'panel' + m.charAt(0).toUpperCase() + m.slice(1);
-  const panelEl = document.getElementById(panelId);
+  const panelEl = document.getElementById('panel' + m.charAt(0).toUpperCase() + m.slice(1));
   if(panelEl) panelEl.classList.add('visible');
   if(m==='flash') initFlash();
   else if(m==='quiz') initQuiz();
   else if(m==='stats') renderStats();
 }
 
-// ===== PHÁT ÂM =====
+function switchStatsTab(tab) {
+  activeStatsTab = tab;
+  document.getElementById('tabFlashBtn').classList.toggle('active', tab==='flash');
+  document.getElementById('tabQuizBtn').classList.toggle('active', tab==='quiz');
+  document.getElementById('statsSubFlash').classList.toggle('visible', tab==='flash');
+  document.getElementById('statsSubQuiz').classList.toggle('visible', tab==='quiz');
+  renderStats();
+}
+
+// ===== PHÁT ÂM NATIVE =====
 function speak(text) {
   if(!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
@@ -675,37 +744,76 @@ function speak(text) {
   if(jp) u.voice=jp;
   window.speechSynthesis.speak(u);
 }
-if(window.speechSynthesis){
-  window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
+
+// ===== CẤU TRÚC LOGIC THỐNG KÊ MỚI (TÁCH BIỆT FLASH vs QUIZ) =====
+function getTodayKey(){ return new Date().toISOString().slice(0,10); }
+
+function loadStats(){ 
+  const defaultStats = {
+    flash: { total: 0, good: 0, bad: 0, days: {} },
+    quiz: { total: 0, correct: 0, wrong: 0, days: {} },
+    wordErrors: {}
+  };
+  const raw = localStorage.getItem('learnStats');
+  if(!raw) return defaultStats;
+  try {
+    const data = JSON.parse(raw);
+    // Tương thích ngược nếu dữ liệu cũ chưa có cấu trúc phân tách độc lập
+    if(!data.flash || !data.quiz) {
+      return defaultStats;
+    }
+    return data;
+  } catch(e) {
+    return defaultStats;
+  }
 }
 
-// ===== THỐNG KÊ LƯU TRỮ =====
-let favorites = JSON.parse(localStorage.getItem('favs')||'[]');
-function getTodayKey(){ return new Date().toISOString().slice(0,10); }
-function loadStats(){ return JSON.parse(localStorage.getItem('learnStats')||'{"total":0,"correct":0,"wrong":0,"days":{},"wordErrors":{}}'); }
 function saveStats(s){ localStorage.setItem('learnStats',JSON.stringify(s)); }
 
-function recordAnswer(isCorrect, wordId) {
+function recordFlashAction(isGood, wordId) {
   const s = loadStats();
-  s.total++;
-  if(isCorrect) s.correct++; else s.wrong++;
+  s.flash.total++;
+  if(isGood) s.flash.good++; else s.flash.bad++;
+  
   const today = getTodayKey();
-  if(!s.days[today]) s.days[today]={correct:0,wrong:0};
-  if(isCorrect) s.days[today].correct++; else s.days[today].wrong++;
-  if(!isCorrect) s.wordErrors[wordId]=(s.wordErrors[wordId]||0)+1;
-  else if(s.wordErrors[wordId]) s.wordErrors[wordId]=Math.max(0,s.wordErrors[wordId]-0.5);
+  if(!s.flash.days[today]) s.flash.days[today] = { good: 0, bad: 0 };
+  if(isGood) s.flash.days[today].good++; else s.flash.days[today].bad++;
+  
+  // Nếu học viên báo chưa thuộc ở flashcard, cũng ghi nhận vào độ yếu từ vựng chung
+  if(!isGood) {
+    s.wordErrors[wordId] = (s.wordErrors[wordId] || 0) + 1;
+  } else if(s.wordErrors[wordId]) {
+    s.wordErrors[wordId] = Math.max(0, s.wordErrors[wordId] - 0.5);
+  }
   saveStats(s);
 }
 
-function calcStreak(days) {
-  let streak=0;
-  const today=new Date();
+function recordQuizAction(isCorrect, wordId) {
+  const s = loadStats();
+  s.quiz.total++;
+  if(isCorrect) s.quiz.correct++; else s.quiz.wrong++;
+  
+  const today = getTodayKey();
+  if(!s.quiz.days[today]) s.quiz.days[today] = { correct: 0, wrong: 0 };
+  if(isCorrect) s.quiz.days[today].correct++; else s.quiz.wrong++;
+  
+  if(!isCorrect) {
+    s.wordErrors[wordId] = (s.wordErrors[wordId] || 0) + 1;
+  } else if(s.wordErrors[wordId]) {
+    s.wordErrors[wordId] = Math.max(0, s.wordErrors[wordId] - 0.5);
+  }
+  saveStats(s);
+}
+
+function calcStreak(daysObject) {
+  let streak=0; const today=new Date();
   for(let i=0;i<365;i++){
     const d=new Date(today); d.setDate(d.getDate()-i);
     const key=d.toISOString().slice(0,10);
-    if(days[key]&&(days[key].correct+days[key].wrong)>0) streak++;
-    else if(i>0) break;
+    const dayData = daysObject[key];
+    if(dayData && ((dayData.good || dayData.bad || dayData.correct || dayData.wrong) > 0)) {
+      streak++;
+    } else if(i>0) break;
   }
   return streak;
 }
@@ -720,37 +828,67 @@ function getSmartDeck() {
 }
 
 function renderStats() {
-  const s=loadStats(); const L=LANG[currentLang];
-  const total=s.correct+s.wrong;
-  const pG=total?Math.round(s.correct/total*100):0;
-  const pW=total?Math.round(s.wrong/total*100):0;
-  document.getElementById('stStreak').textContent=calcStreak(s.days);
-  document.getElementById('stTotal').textContent=s.total;
-  document.getElementById('stCorrect').textContent=s.correct;
-  document.getElementById('stWrong').textContent=s.wrong;
-  document.getElementById('stPct').textContent=pG+'%';
-  document.getElementById('stPctW').textContent=pW+'%';
-  document.getElementById('stBarGood').style.width=pG+'%';
-  document.getElementById('stBarBad').style.width=pW+'%';
-  const days=[];
-  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
-  document.getElementById('stHistory').innerHTML=days.map(day=>{
-    const data=s.days[day]||{correct:0,wrong:0};
-    const tot=data.correct+data.wrong;
-    const lbl=day===getTodayKey()?L.today:day.slice(5).replace('-','/');
-    return `<div class="day-row"><span class="day-date">${lbl}</span><div class="day-info">${tot===0?`<span style="color:var(--muted);font-size:12px">${L.noData}</span>`:`<span class="g">✅ ${data.correct}</span><span class="r">❌ ${data.wrong}</span>`}</div></div>`;
-  }).join('');
-  const sorted=Object.entries(s.wordErrors).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('stWeakWords').innerHTML=sorted.length?sorted.map(([id,cnt])=>{
-    const w=WORDS.find(x=>x.id==id); if(!w) return '';
+  const s = loadStats(); 
+  const L = LANG[currentLang];
+  const last7Days = [];
+  for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); last7Days.push(d.toISOString().slice(0,10)); }
+
+  if(activeStatsTab === 'flash') {
+    // Render Flashcard Stats
+    const totalFlash = s.flash.good + s.flash.bad;
+    const pGood = totalFlash ? Math.round(s.flash.good / totalFlash * 100) : 0;
+    const pBad = totalFlash ? Math.round(s.flash.bad / totalFlash * 100) : 0;
+    
+    document.getElementById('stFlashStreak').textContent = calcStreak(s.flash.days);
+    document.getElementById('stFlashTotal').textContent = s.flash.total;
+    document.getElementById('stFlashGood').textContent = s.flash.good;
+    document.getElementById('stFlashBad').textContent = s.flash.bad;
+    document.getElementById('stFlashPctGood').textContent = pGood + '%';
+    document.getElementById('stFlashPctBad').textContent = pBad + '%';
+    document.getElementById('stFlashBarGood').style.width = pGood + '%';
+    document.getElementById('stFlashBarBad').style.width = pBad + '%';
+    
+    document.getElementById('stFlashHistory').innerHTML = last7Days.map(day => {
+      const data = s.flash.days[day] || { good: 0, bad: 0 };
+      const tot = data.good + data.bad;
+      const lbl = day === getTodayKey() ? L.today : day.slice(5).replace('-','/');
+      return `<div class="day-row"><span class="day-date">${lbl}</span><div class="day-info">${tot===0?`<span style="color:var(--muted);font-size:12px">${L.noData}</span>`:`<span class="g">👍 ${data.good}</span><span class="r">👎 ${data.bad}</span>`}</div></div>`;
+    }).join('');
+
+  } else {
+    // Render Quiz Stats
+    const totalQuiz = s.quiz.correct + s.quiz.wrong;
+    const pCorrect = totalQuiz ? Math.round(s.quiz.correct / totalQuiz * 100) : 0;
+    const pWrong = totalQuiz ? Math.round(s.quiz.wrong / totalQuiz * 100) : 0;
+    
+    document.getElementById('stQuizStreak').textContent = calcStreak(s.quiz.days);
+    document.getElementById('stQuizTotal').textContent = s.quiz.total;
+    document.getElementById('stQuizCorrect').textContent = s.quiz.correct;
+    document.getElementById('stQuizWrong').textContent = s.quiz.wrong;
+    document.getElementById('stQuizPctGood').textContent = pCorrect + '%';
+    document.getElementById('stQuizPctBad').textContent = pWrong + '%';
+    document.getElementById('stQuizBarGood').style.width = pCorrect + '%';
+    document.getElementById('stQuizBarBad').style.width = pWrong + '%';
+    
+    document.getElementById('stQuizHistory').innerHTML = last7Days.map(day => {
+      const data = s.quiz.days[day] || { correct: 0, wrong: 0 };
+      const tot = data.correct + data.wrong;
+      const lbl = day === getTodayKey() ? L.today : day.slice(5).replace('-','/');
+      return `<div class="day-row"><span class="day-date">${lbl}</span><div class="day-info">${tot===0?`<span style="color:var(--muted);font-size:12px">${L.noData}</span>`:`<span class="g">✅ ${data.correct}</span><span class="r">❌ ${data.wrong}</span>`}</div></div>`;
+    }).join('');
+  }
+
+  // Render Danh Sách Từ Vựng Hay Sai Chung
+  const sortedErrors = Object.entries(s.wordErrors).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('stWeakWords').innerHTML = sortedErrors.length ? sortedErrors.map(([id,cnt])=>{
+    const w = WORDS.find(x=>x.id==id); if(!w) return '';
     return `<div class="day-row"><div><div style="font-size:13px;font-weight:700;color:var(--navy)">${w.viet}</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--red)">${w.kanji}</div></div><span style="font-size:12px;font-weight:700;color:var(--red)">${Math.ceil(cnt)} ${L.weakTimes}</span></div>`;
-  }).join(''):`<p style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0">${L.noData}</p>`;
+  }).join('') : `<p style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0">${L.noData}</p>`;
 }
 
-// ===== FLASHCARD CUỐN CHIẾU THÔNG MINH =====
+// ===== LOGIC VÒNG LẶP FLASHCARD CUỐN CHIẾU =====
 let flashPool=[], currentQueue=[], flashGood=0, flashBad=0, flashMode='vn', flashFlipped=false;
-let currentIndexInQueue = 0; 
-let continuousWrongCount = 0; 
+let currentIndexInQueue = 0; let continuousWrongCount = 0;
 
 function setFlashMode(m){
   flashMode=m;
@@ -768,49 +906,32 @@ function initFlash(){
   else pool=WORDS.filter(w=>w.group===grp);
   
   flashPool=(pool.length?pool:[...WORDS]).sort(()=>Math.random()-.5);
+  flashGood=0; flashBad=0; flashFlipped=false; continuousWrongCount = 0;
+  currentIndexInQueue = 0; currentQueue = [];
   
-  flashGood=0;
-  flashBad=0;
-  flashFlipped=false;
-  continuousWrongCount = 0;
-  currentIndexInQueue = 0;
-  currentQueue = [];
-  
-  refillQueue();
-  updateFlashStats();
-  renderFlashCard();
+  refillQueue(); updateFlashStats(); renderFlashCard();
 }
 
 function refillQueue() {
-  while (currentQueue.length < 5 && flashPool.length > 0) {
-    currentQueue.push(flashPool.shift()); 
-  }
+  while (currentQueue.length < 5 && flashPool.length > 0) { currentQueue.push(flashPool.shift()); }
 }
 
 function updateFlashStats(){
-  const totalRemaining = currentQueue.length + flashPool.length;
-  document.getElementById('fsTotal').textContent = totalRemaining;
+  document.getElementById('fsTotal').textContent = currentQueue.length + flashPool.length;
   document.getElementById('fsGood').textContent = flashGood;
   document.getElementById('fsBad').textContent = flashBad;
-  
-  const totalWordsCount = WORDS.length;
-  document.getElementById('flashBar').style.width = (totalWordsCount ? Math.round(flashGood / totalWordsCount * 100) : 0) + '%';
+  document.getElementById('flashBar').style.width = Math.round(flashGood / (WORDS.length || 1) * 100) + '%';
 }
 
 function renderFlashCard(){
-  const el=document.getElementById('flashContent');
-  const L=LANG[currentLang];
-  
+  const el=document.getElementById('flashContent'); const L=LANG[currentLang];
   if(currentQueue.length === 0 && flashPool.length === 0){
     const totalWordsCount = WORDS.length || 1;
     const pct=Math.round(flashGood / totalWordsCount * 100);
     el.innerHTML=`<div class="done-wrap"><div class="done-icon">${pct>=80?'🎉':pct>=50?'👍':'📚'}</div><h2>${pct>=80?L.doneXs:pct>=50?L.doneGood:L.doneNeed}</h2><p>${L.doneTxt} <b>${flashGood}/${totalWordsCount}</b> ${L.doneTxt2} (${pct}%)<br>${L.doneChua}: <b>${flashBad}</b> ${L.doneTxt2}</p><button class="restart-btn" onclick="initFlash()">${L.restartBtn}</button></div>`;
     return;
   }
-  
-  if(currentIndexInQueue >= currentQueue.length) {
-    currentIndexInQueue = 0;
-  }
+  if(currentIndexInQueue >= currentQueue.length) currentIndexInQueue = 0;
   
   const w=currentQueue[currentIndexInQueue];
   const imgSrc=IMGS[w.id]||'';
@@ -823,13 +944,9 @@ function renderFlashCard(){
     <div class="tap-hint">${L.tapHint} (${currentIndexInQueue+1}/${currentQueue.length})</div>
     <div class="card-wrap" onclick="flipCard()">
       <div class="fc${flashFlipped?' flipped':''}">
-        <div class="fc-face fc-front">
-          <div class="fc-hint">${L.frontHint}</div>
-          ${frontMain}${frontSub}
-        </div>
+        <div class="fc-face fc-front"> <div class="fc-hint">${L.frontHint}</div>${frontMain}${frontSub} </div>
         <div class="fc-face fc-back">
-          <div class="fc-hint">${L.backHint}</div>
-          ${imgHtml}
+          <div class="fc-hint">${L.backHint}</div> ${imgHtml}
           <div class="fc-back-viet">${w.viet}</div>
           <div style="display:flex;align-items:center;justify-content:center;gap:8px">
             <div class="fc-back-jp">${w.kanji}</div>
@@ -850,60 +967,39 @@ function renderFlashCard(){
 
 function flipCard(){flashFlipped=!flashFlipped;renderFlashCard();}
 
-function answerCard(correct){
+function answerCard(isGood){
   if(currentQueue.length === 0) return;
   
-  recordAnswer(correct, currentQueue[currentIndexInQueue].id);
+  // GHI VÀO THỐNG KÊ FLASHCARD ĐỘC LẬP
+  recordFlashAction(isGood, currentQueue[currentIndexInQueue].id);
   
-  if (correct) {
+  if (isGood) {
     currentQueue.splice(currentIndexInQueue, 1);
-    flashGood++;
-    continuousWrongCount = 0; 
-    
-    refillQueue();
-    
-    if(currentQueue.length === 0) {
-      flashFlipped = false;
-      renderFlashCard();
-      return;
-    }
-    
-    if (currentIndexInQueue >= currentQueue.length) {
-      currentIndexInQueue = 0;
-    }
+    flashGood++; continuousWrongCount = 0; refillQueue();
+    if(currentQueue.length === 0) { flashFlipped = false; renderFlashCard(); return; }
+    if (currentIndexInQueue >= currentQueue.length) currentIndexInQueue = 0;
   } else {
-    flashBad++;
-    continuousWrongCount++;
-    
+    flashBad++; continuousWrongCount++;
     if (continuousWrongCount >= 10) {
       const L = LANG[currentLang];
       document.getElementById('modalTitle').textContent = L.alertTitle;
       document.getElementById('modalMsg').textContent = L.alertMsg;
       document.getElementById('modalCancel').style.display = 'none';
-      const confirmBtn = document.getElementById('modalConfirm');
-      confirmBtn.textContent = L.alertBtn;
-      
+      document.getElementById('modalConfirm').textContent = L.alertBtn;
       _modalCallback = () => {
-        closeModal();
-        document.getElementById('modalCancel').style.display = 'block';
-        continuousWrongCount = 0;
-        renderFlashCard();
+        closeModal(); document.getElementById('modalCancel').style.display = 'block';
+        continuousWrongCount = 0; renderFlashCard();
       };
       document.getElementById('confirmModal').classList.add('visible');
       return;
     }
-    
     currentIndexInQueue++;
-    if (currentIndexInQueue >= currentQueue.length) {
-      currentIndexInQueue = 0;
-    }
+    if (currentIndexInQueue >= currentQueue.length) currentIndexInQueue = 0;
   }
-  
-  flashFlipped=false;
-  renderFlashCard();
+  flashFlipped=false; renderFlashCard();
 }
 
-// ===== QUIZ =====
+// ===== LOGIC TRẮC NGHIỆM / KIỂM TRA ĐỘC LẬP =====
 let quizType='mc',quizPool=[],quizIdx=0,quizCorrect=0,quizWrong=0,mcAnswered=false;
 let matchLeftSel=null,matchRightSel=null,matchPairs=[];
 
@@ -936,8 +1032,7 @@ function updateQuizStats(){
 function renderQuiz(){if(quizType==='mc')renderMC();else renderMatch();}
 
 function renderMC(){
-  const el=document.getElementById('quizContent');
-  const L=LANG[currentLang];
+  const el=document.getElementById('quizContent'); const L=LANG[currentLang];
   if(!quizPool.length){el.innerHTML=`<div class="empty-wrap"><div style="font-size:48px">📭</div><p>${L.emptyMsg}</p></div>`;return;}
   if(quizIdx>=quizPool.length){showQuizDone(el);return;}
   const correct=quizPool[quizIdx];
@@ -949,15 +1044,13 @@ function renderMC(){
   mcAnswered=false;
   el.innerHTML=`<div class="mc-card">
     <div class="mc-qnum">${currentLang==='vn'?'Câu':'問題'} ${quizIdx+1} / ${quizPool.length}</div>
-    ${imgHtml}
-    <div class="mc-q${showJP?' jp':''}">${showJP?correct.kanji:correct.viet}</div>
+    ${imgHtml} <div class="mc-q${showJP?' jp':''}">${showJP?correct.kanji:correct.viet}</div>
     ${showJP?`<div class="mc-sub">${correct.hira} <button class="speak-btn" onclick="speak('${correct.hira}')">🔊</button></div>`:''}
     <div class="mc-opts">
       ${opts.map(o=>`<button class="mc-opt" data-id="${o.id}" data-correct="${correct.id}" onclick="answerMC(this)">
         ${showJP?o.viet:o.kanji}${!showJP?`<br><span style="font-size:11px;font-family:'Noto Sans JP',sans-serif;opacity:.7">${o.hira}</span>`:''}
       </button>`).join('')}
-    </div>
-    <div id="mcFeedback"></div>
+    </div> <div id="mcFeedback"></div>
   </div>`;
 }
 
@@ -965,9 +1058,11 @@ function answerMC(btn){
   if(mcAnswered)return;
   mcAnswered=true;
   const chosen=btn.dataset.id,correctId=btn.dataset.correct;
-  const isOk=chosen===correctId;
-  const L=LANG[currentLang];
-  recordAnswer(isOk,correctId);
+  const isOk=chosen===correctId; const L=LANG[currentLang];
+  
+  // GHI VÀO LOGIC THỐNG KÊ KIỂM TRA ĐỘC LẬP
+  recordQuizAction(isOk, correctId);
+  
   document.querySelectorAll('.mc-opt').forEach(o=>o.classList.add('disabled'));
   btn.classList.add(isOk?'correct':'wrong');
   if(!isOk) document.querySelectorAll('.mc-opt').forEach(o=>{if(o.dataset.id===correctId)o.classList.add('correct');});
@@ -983,8 +1078,7 @@ function nextMC(){quizIdx++;mcAnswered=false;renderQuiz();}
 
 const MATCH_SIZE=5;
 function renderMatch(){
-  const el=document.getElementById('quizContent');
-  const L=LANG[currentLang];
+  const el=document.getElementById('quizContent'); const L=LANG[currentLang];
   if(!quizPool.length||quizIdx>=quizPool.length){showQuizDone(el);return;}
   const batch=quizPool.slice(quizIdx,quizIdx+MATCH_SIZE);
   matchPairs=batch.map(w=>({id:w.id,viet:w.viet,kanji:w.kanji,hira:w.hira}));
@@ -1025,19 +1119,26 @@ function selectMatch(side,id){
     if(matchLeftSel===matchRightSel){
       lEl.classList.remove('selected');lEl.classList.add('matched-ok');lEl.style.pointerEvents='none';
       rEl.classList.remove('selected');rEl.classList.add('matched-ok');
-      recordAnswer(true,matchLeftSel);quizCorrect++;updateQuizStats();
+      
+      // GHI VÀO THỐNG KÊ KIỂM TRA ĐỘC LẬP
+      recordQuizAction(true, matchLeftSel);
+      
+      quizCorrect++;updateQuizStats();
       const allDone=matchPairs.every(p=>document.getElementById(`ml_${p.id}`)?.classList.contains('matched-ok'));
       if(allDone){
         quizIdx+=MATCH_SIZE;
-        const fb=document.getElementById('matchFeedback');
-        fb.innerHTML=L.matchDone;fb.style.color='#27AE60';
-        const nb=document.getElementById('matchNextBtn');
-        nb.textContent=L.matchNext;nb.style.display='block';
+        document.getElementById('matchFeedback').innerHTML=L.matchDone;
+        document.getElementById('matchFeedback').style.color='#27AE60';
+        document.getElementById('matchNextBtn').style.display='block';
       }
     }else{
       lEl.classList.remove('selected');lEl.classList.add('matched-fail');
       rEl.classList.remove('selected');rEl.classList.add('matched-fail');
-      recordAnswer(false,matchLeftSel);quizWrong++;updateQuizStats();
+      
+      // GHI VÀO THỐNG KÊ KIỂM TRA ĐỘC LẬP (LỖI)
+      recordQuizAction(false, matchLeftSel);
+      
+      quizWrong++;updateQuizStats();
       setTimeout(()=>{lEl.classList.remove('matched-fail');rEl.classList.remove('matched-fail');},700);
     }
     matchLeftSel=null;matchRightSel=null;
@@ -1045,12 +1146,12 @@ function selectMatch(side,id){
 }
 
 function showQuizDone(el){
-  const pct=Math.round(quizCorrect/((quizCorrect+quizWrong)||1)*100);
-  const L=LANG[currentLang];
+  const pct=Math.round(quizCorrect/((quizCorrect+quizWrong)||1)*100); const L=LANG[currentLang];
   el.innerHTML=`<div class="done-wrap"><div class="done-icon">${pct>=80?'🏆':pct>=50?'👍':'📚'}</div><h2>${pct>=80?L.quizDoneXs:pct>=50?L.quizDoneGood:L.quizDoneNeed}</h2><p>${L.quizDoneRight}: <b>${quizCorrect}</b> — ${L.quizDoneWrong}: <b>${quizWrong}</b><br>${L.quizDonePct} <b>${pct}%</b></p><button class="restart-btn" onclick="initQuiz()">${L.quizRestart}</button></div>`;
 }
 
-// KHỞI ĐỘNG HỆ THỐNG
+// KHỞI CHẠY ỨNG DỤNG
+let favorites = JSON.parse(localStorage.getItem('favs')||'[]');
 setLang(currentLang);
 setMode('flash');
 </script>
