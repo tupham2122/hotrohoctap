@@ -360,12 +360,15 @@ const LANG = {
     quizRestart:'🔄 Làm lại',
     qTypeMC:'🔤 Trắc nghiệm', qTypeMatch:'🔗 Nối từ',
     emptyMsg:'Chưa có từ nào — hãy chọn nhóm khác',
+    alertTitle:'Cố gắng lên nào! 💪',
+    alertMsg:'Bạn đã bấm "Chưa thuộc" liên tiếp 10 lần rồi. Hãy bình tĩnh xem lại các từ và tập trung hơn nhé!',
+    alertBtn:'Tôi đã hiểu, học tiếp'
   },
   jp: {
     navFlash:'フラッシュ', navQuiz:'テスト', navStats:'統計', navAbout:'アプリ情報',
     lblGroup:'グループ:', lblRemain:'残り', lblKnow:'覚えた', lblDontKnow:'未定着',
     lblQuestions:'問題数', lblCorrect:'正解', lblIncorrect:'不正解',
-    statsTitle:'📊 学習統計',
+    statsTitle:'📊 項目別統計',
     lblStreak:'🔥 連続日数', lblTotalSessions:'📚 総学習回数',
     lblTotalCorrect:'✅ 正解数', lblTotalWrong:'❌ 不正解数',
     lblAccuracy:'🎯 正解率', lblRight:'正解', lblWrong2:'不正解',
@@ -397,6 +400,9 @@ const LANG = {
     quizRestart:'🔄 もう一度',
     qTypeMC:'🔤 四択問題', qTypeMatch:'🔗 マッチング',
     emptyMsg:'単語がありません — 他のグループを選んでください',
+    alertTitle:'がんばってください！ 💪',
+    alertMsg:'10回連続で「未定着」が押されました。焦らずに単語をもう一度確認して、集中して進めましょう！',
+    alertBtn:'了解して学習を続ける'
   }
 };
 
@@ -571,8 +577,9 @@ function renderStats() {
   }).join(''):`<p style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0">${L.noData}</p>`;
 }
 
-// ===== FLASHCARD =====
-let flashDeck=[],flashIdx=0,flashGood=0,flashBad=0,flashMode='vn',flashFlipped=false;
+// ===== FLASHCARD (ĐÃ ĐƯỢC TỐI ƯU THUẬT TOÁN 5 CÂU) =====
+let flashPool=[], currentQueue=[], flashIdx=0, flashGood=0, flashBad=0, flashMode='vn', flashFlipped=false;
+let continuousWrongCount = 0; // Bộ đếm phạt sai liên tiếp
 
 function setFlashMode(m){
   flashMode=m;
@@ -588,35 +595,75 @@ function initFlash(){
   else if(grp==='fav') pool=WORDS.filter(w=>favorites.includes(w.id));
   else if(grp==='smart') pool=getSmartDeck();
   else pool=WORDS.filter(w=>w.group===grp);
-  flashDeck=(pool.length?pool:[...WORDS]).sort(()=>Math.random()-.5);
-  flashIdx=0;flashGood=0;flashBad=0;flashFlipped=false;
-  updateFlashStats();renderFlashCard();
+  
+  // Trộn đều kho dữ liệu tổng được chọn ban đầu
+  flashPool=(pool.length?pool:[...WORDS]).sort(()=>Math.random()-.5);
+  
+  flashIdx=0;
+  flashGood=0;
+  flashBad=0;
+  flashFlipped=false;
+  continuousWrongCount = 0;
+  
+  // Khởi động cụm 5 từ đầu tiên từ kho dữ liệu tổng
+  loadNextSessionGroup();
+}
+
+// Hàm nạp cụm 5 từ tiếp theo từ kho dữ liệu tổng vào hàng đợi học cuốn chiếu
+function loadNextSessionGroup() {
+  currentQueue = [];
+  for(let i = 0; i < 5; i++) {
+    if(flashIdx < flashPool.length) {
+      currentQueue.push({...flashPool[flashIdx]});
+      flashIdx++;
+    }
+  }
+  // Reset con trỏ vị trí hiển thị hiện tại trong cụm 5 từ về từ đầu tiên
+  currentIndexInQueue = 0;
+  
+  updateFlashStats();
+  renderFlashCard();
 }
 
 function updateFlashStats(){
-  document.getElementById('fsTotal').textContent=Math.max(0,flashDeck.length-flashIdx);
-  document.getElementById('fsGood').textContent=flashGood;
-  document.getElementById('fsBad').textContent=flashBad;
-  document.getElementById('flashBar').style.width=(flashDeck.length?Math.round(flashIdx/flashDeck.length*100):0)+'%';
+  // Số từ còn lại của cả lượt học bằng: Số từ chưa bốc từ Pool + Số từ chưa thuộc trong cụm hiện tại
+  const totalRemaining = Math.max(0, flashPool.length - flashIdx) + currentQueue.length;
+  document.getElementById('fsTotal').textContent = totalRemaining;
+  document.getElementById('fsGood').textContent = flashGood;
+  document.getElementById('fsBad').textContent = flashBad;
+  
+  // Thanh Progress tính tiến độ dựa trên số từ tổng đã thuộc hoàn toàn
+  const totalWordsCount = flashPool.length;
+  document.getElementById('flashBar').style.width = (totalWordsCount ? Math.round(flashGood / totalWordsCount * 100) : 0) + '%';
 }
 
 function renderFlashCard(){
   const el=document.getElementById('flashContent');
   const L=LANG[currentLang];
-  if(!flashDeck.length){el.innerHTML=`<div class="empty-wrap"><div style="font-size:48px">📭</div><p>${L.emptyMsg}</p></div>`;return;}
-  if(flashIdx>=flashDeck.length){
-    const pct=Math.round(flashGood/(flashDeck.length||1)*100);
-    el.innerHTML=`<div class="done-wrap"><div class="done-icon">${pct>=80?'🎉':pct>=50?'👍':'📚'}</div><h2>${pct>=80?L.doneXs:pct>=50?L.doneGood:L.doneNeed}</h2><p>${L.doneTxt} <b>${flashGood}/${flashDeck.length}</b> ${L.doneTxt2} (${pct}%)<br>${L.doneChua}: <b>${flashBad}</b> ${L.doneTxt2}</p><button class="restart-btn" onclick="initFlash()">${L.restartBtn}</button></div>`;
+  
+  // Nếu cả mảng Pool tổng và cụm từ hiện tại đều hết sạch dữ liệu -> Hoàn thành bài học
+  if(!flashPool.length && !currentQueue.length){
+    el.innerHTML=`<div class="empty-wrap"><div style="font-size:48px">📭</div><p>${L.emptyMsg}</p></div>`;
     return;
   }
-  const w=flashDeck[flashIdx];
+  
+  if(currentQueue.length === 0 && flashIdx >= flashPool.length){
+    const totalWordsCount = flashPool.length || 1;
+    const pct=Math.round(flashGood / totalWordsCount * 100);
+    el.innerHTML=`<div class="done-wrap"><div class="done-icon">${pct>=80?'🎉':pct>=50?'👍':'📚'}</div><h2>${pct>=80?L.doneXs:pct>=50?L.doneGood:L.doneNeed}</h2><p>${L.doneTxt} <b>${flashGood}/${totalWordsCount}</b> ${L.doneTxt2} (${pct}%)<br>${L.doneChua}: <b>${flashBad}</b> ${L.doneTxt2}</p><button class="restart-btn" onclick="initFlash()">${L.restartBtn}</button></div>`;
+    return;
+  }
+  
+  const w=currentQueue[currentIndexInQueue];
   const imgSrc=IMGS[w.id]||'';
   const imgHtml=imgSrc?`<div class="fc-img-wrap"><img class="fc-img" src="${imgSrc}"></div>`:'';
   let frontMain,frontSub;
   if(flashMode==='vn'){frontMain=`<div class="fc-main">${w.viet}</div>`;frontSub=`<div class="fc-sub">${w.group}</div>`;}
   else{frontMain=`<div class="fc-main" style="font-family:'Noto Sans JP',sans-serif">${w.kanji}</div>`;frontSub=`<div class="fc-sub" style="font-family:'Noto Sans JP',sans-serif">${w.hira}</div>`;}
+  
+  // Tính tổng số lượng từ hiện tại để hiển thị số thứ tự thẻ (ví dụ 1/5)
   el.innerHTML=`
-    <div class="tap-hint">${L.tapHint} (${flashIdx+1}/${flashDeck.length})</div>
+    <div class="tap-hint">${L.tapHint} (${currentIndexInQueue+1}/${currentQueue.length})</div>
     <div class="card-wrap" onclick="flipCard()">
       <div class="fc${flashFlipped?' flipped':''}">
         <div class="fc-face fc-front">
@@ -647,10 +694,59 @@ function renderFlashCard(){
 function flipCard(){flashFlipped=!flashFlipped;renderFlashCard();}
 
 function answerCard(correct){
-  recordAnswer(correct,flashDeck[flashIdx].id);
-  if(!correct){flashBad++;flashDeck.push(flashDeck[flashIdx]);}else flashGood++;
-  flashIdx++;flashFlipped=false;renderFlashCard();
+  if(currentQueue.length === 0) return;
+  
+  recordAnswer(correct, currentQueue[currentIndexInQueue].id);
+  
+  if (correct) {
+    // THUỘC BÀI: Xoá hẳn khỏi hàng đợi 5 câu hiện tại
+    currentQueue.splice(currentIndexInQueue, 1);
+    flashGood++;
+    continuousWrongCount = 0; // Reset số lần sai liên tiếp về 0
+    
+    // Nếu cụm 5 từ cũ đã thuộc sạch bóng, tiến hành nạp bộ 5 câu mới
+    if (currentQueue.length === 0) {
+      flashFlipped = false;
+      loadNextSessionGroup();
+      return;
+    }
+  } else {
+    // CHƯA THUỘC: Giữ nguyên từ trong nhóm, tăng bộ đếm sai liên tiếp
+    flashBad++;
+    continuousWrongCount++;
+    
+    // Nếu bấm sai liên tiếp chạm ngưỡng 10 lần, hiển thị thông báo động viên chặn bấm tiếp
+    if (continuousWrongCount >= 10) {
+      const L = LANG[currentLang];
+      document.getElementById('modalTitle').textContent = L.alertTitle;
+      document.getElementById('modalMsg').textContent = L.alertMsg;
+      document.getElementById('modalCancel').style.display = 'none'; // Ẩn nút hủy
+      const confirmBtn = document.getElementById('modalConfirm');
+      confirmBtn.textContent = L.alertBtn;
+      
+      _modalCallback = () => {
+        closeModal();
+        document.getElementById('modalCancel').style.display = 'block'; // Khôi phục trạng thái nút hủy
+        continuousWrongCount = 0; // Reset lại bộ đếm sau khi người dùng xác nhận xong
+        renderFlashCard();
+      };
+      document.getElementById('confirmModal').classList.add('visible');
+      return;
+    }
+    
+    // Di chuyển con trỏ sang từ tiếp theo trong cụm 5 từ
+    currentIndexInQueue++;
+  }
+  
+  // Thuật toán vòng tròn: Nếu con trỏ vượt quá độ dài mảng cụm hiện tại, quay lại từ số 0
+  if (currentIndexInQueue >= currentQueue.length) {
+    currentIndexInQueue = 0;
+  }
+  
+  flashFlipped=false;
+  renderFlashCard();
 }
+
 
 // ===== QUIZ =====
 let quizType='mc',quizPool=[],quizIdx=0,quizCorrect=0,quizWrong=0,mcAnswered=false;
